@@ -111,6 +111,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,6 +131,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
