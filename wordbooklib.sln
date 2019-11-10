@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29418.71
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wordbook-lookup", "wordbook-lookup\wordbook-lookup.vcxproj", "{8523C64F-C28C-4269-B64B-33F913D811FE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wordbooklib", "wordbooklib\wordbooklib.vcxitems", "{A91BF58B-5607-4692-8B4D-047B7C8A548E}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		wordbooklib\wordbooklib.vcxitems*{8523c64f-c28c-4269-b64b-33f913d811fe}*SharedItemsImports = 4
+		wordbooklib\wordbooklib.vcxitems*{a91bf58b-5607-4692-8b4d-047b7c8a548e}*SharedItemsImports = 9
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Debug|x64.ActiveCfg = Debug|x64
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Debug|x64.Build.0 = Debug|x64
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Debug|x86.ActiveCfg = Debug|Win32
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Debug|x86.Build.0 = Debug|Win32
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Release|x64.ActiveCfg = Release|x64
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Release|x64.Build.0 = Release|x64
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Release|x86.ActiveCfg = Release|Win32
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FD1C2F9C-B9C8-41C6-8D53-4FADF532016E}
+	EndGlobalSection
+EndGlobal
