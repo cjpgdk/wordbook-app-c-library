@@ -39,11 +39,11 @@ typedef struct wordbook_dictionary
      */
     char *id;
     /**
-     * Short name of the ictionary eg. tur-deu
+     * Short name of the dictionary eg. tur-deu
      */
     char *short_name;
     /**
-     * Full name of the ictionary eg. Turkish-German
+     * Full name of the dictionary eg. Turkish-German
      */
     char *long_name;
     /**
@@ -102,7 +102,7 @@ curl_download_result wordbook_perform_http_get(const char *url);
 curl_download_result wordbook_get_dictionaries_json();
 
 // free memory used by the 'wordbook_array_dictionary'
-void wordbook_array_dictionary_free(wordbook_array_dictionary* dict_array);
+void wordbook_array_dictionary_free(wordbook_array_dictionary *dict_array);
 
 /** get all available dictionaries
  * 

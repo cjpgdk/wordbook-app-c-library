@@ -178,7 +178,7 @@ void insert_wordbook_dictionary(wordbook_array_dictionary *dict_array, wordbook_
     // Copy the id.
     len = strlen(dict.id) + 1;
     dict_array->dicts[index].id = malloc(len);
-    if (dict_array->dicts[index].alphabet != NULL)
+    if (dict_array->dicts[index].id != NULL)
     {
         strcpy(dict_array->dicts[index].id, dict.id);
     }
@@ -186,7 +186,7 @@ void insert_wordbook_dictionary(wordbook_array_dictionary *dict_array, wordbook_
     // Copy the info.
     len = strlen(dict.info) + 1;
     dict_array->dicts[index].info = malloc(len);
-    if (dict_array->dicts[index].alphabet != NULL)
+    if (dict_array->dicts[index].info != NULL)
     {
         strcpy(dict_array->dicts[index].info, dict.info);
     }
@@ -194,7 +194,7 @@ void insert_wordbook_dictionary(wordbook_array_dictionary *dict_array, wordbook_
     // Copy the long_name.
     len = strlen(dict.long_name) + 1;
     dict_array->dicts[index].long_name = malloc(len);
-    if (dict_array->dicts[index].alphabet != NULL)
+    if (dict_array->dicts[index].long_name != NULL)
     {
         strcpy(dict_array->dicts[index].long_name, dict.long_name);
     }
@@ -202,7 +202,7 @@ void insert_wordbook_dictionary(wordbook_array_dictionary *dict_array, wordbook_
     // Copy the short_name.
     len = strlen(dict.short_name) + 1;
     dict_array->dicts[index].short_name = malloc(len);
-    if (dict_array->dicts[index].alphabet != NULL)
+    if (dict_array->dicts[index].short_name != NULL)
     {
         strcpy(dict_array->dicts[index].short_name, dict.short_name);
     }
@@ -210,7 +210,7 @@ void insert_wordbook_dictionary(wordbook_array_dictionary *dict_array, wordbook_
     // Copy the url.
     len = strlen(dict.url) + 1;
     dict_array->dicts[index].url = malloc(len);
-    if (dict_array->dicts[index].alphabet != NULL)
+    if (dict_array->dicts[index].url != NULL)
     {
         strcpy(dict_array->dicts[index].url, dict.url);
     }
