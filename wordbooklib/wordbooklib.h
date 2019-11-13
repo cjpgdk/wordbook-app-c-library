@@ -22,7 +22,7 @@ typedef struct curl_download_result
     /**
      * pointer to a \0 terminated string of the data in memory
      */
-    char* ptr;
+    char *ptr;
     /**
      * the length
      */
