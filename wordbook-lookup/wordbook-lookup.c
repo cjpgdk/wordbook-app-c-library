@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     bool print_dicts = false, print_help = false;
     char *print_dict = NULL;
     char c;
-    while ((c = getopt(argc, argv, ":dD:h")) != -1)
+    while ((c = getopt(argc, argv, "D:dh")) != -1)
     {
         switch (c)
         {
