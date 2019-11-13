@@ -30,11 +30,14 @@ int main(int argc, char *argv[])
     bool print_dicts = false, print_help = false;
     char *print_dict = NULL;
     char c;
-    while ((c = getopt(argc, argv, "d:h")) != -1)
+    while ((c = getopt(argc, argv, ":dD:h")) != -1)
     {
         switch (c)
         {
         case 'd':
+            print_dicts = true;
+            break;
+        case 'D':
             print_dicts = true;
             print_dict = optarg;
             break;
@@ -71,9 +74,9 @@ void print_help_text(const char *app)
     printf("Usage: ./%s\n\n", app);
     printf(" - ./%s -d\n", app);
     printf("\tList all dictionaries\n");
-    printf(" - ./%s -d [dictionary-search]\n", app);
+    printf(" - ./%s -D [dictionary-search]\n", app);
     printf("\tList only dictionaries where id, long name or short name matches 'dictionary-search'\n");
-    printf("\teg. ./%s -d english\n", app);
+    printf("\teg. ./%s -D english\n", app);
 }
 
 // print all dictionaries
