@@ -71,9 +71,6 @@ int main(int argc, char *argv[])
 
     if (print_suggests)
     {
-        printf("%s\n", print_suggest);
-        printf("%s\n", print_dict);
-        printf("%s\n", NULL);
         wordbook_get_suggestions(print_suggest, print_dict);
         return EXIT_SUCCESS;
     }
