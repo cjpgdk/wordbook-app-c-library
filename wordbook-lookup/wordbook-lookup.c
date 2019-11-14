@@ -62,13 +62,15 @@ int main(int argc, char *argv[])
     }
 
     // print dictionaries.
-    // if print_suggests that we ship and use the dict_id in the suggestions lookup
+    // if print_suggests than we skip and use the dict_id in the suggestions lookup
     if (print_dicts && !print_suggests)
     {
         print_all_dictionaries(print_dict);
         return EXIT_SUCCESS;
     }
 
+    // print suggextions.
+    // if we have a dictionary id we use that to show the definition
     if (print_suggests)
     {
         wordbook_array_suggestions_t suggestion_array = wordbook_get_suggestions(print_suggest, print_dict);
@@ -83,7 +85,7 @@ int main(int argc, char *argv[])
             printf("Src language id .: %i\n", suggestion.source_language_id);
             if (print_dicts)
             {
-                // todo: show difinition of the word
+                // todo: show definition of the word
             }
             printf("--------------------------------------------------------\n\n");
         }
