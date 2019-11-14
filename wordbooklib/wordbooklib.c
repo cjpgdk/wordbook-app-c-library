@@ -190,7 +190,7 @@ wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const c
                 json_object *obj = json_object_array_get_idx(suggestions_obj, i);
 
                 // create a temporary dict.
-                struct wordbook_suggestion suggest = (struct wordbook_suggestion){ NULL,  NULL, NULL, NULL };
+                struct wordbook_suggestion suggest = (struct wordbook_suggestion){ 0,  NULL, 0, NULL };
 
                 // lets just confirm this is an object
                 if (json_object_is_type(obj, json_type_object))
@@ -217,8 +217,8 @@ wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const c
                         struct json_object *obj_val = json_object_iter_peek_value(&it);
                         if (json_object_is_type(obj_val, json_type_string))
                         {
-                            char *name = json_object_iter_peek_name(&it);
-                            char *value = json_object_get_string(obj_val);
+                            const char *name = json_object_iter_peek_name(&it);
+                            const char *value = json_object_get_string(obj_val);
 
                             // Copy language name
                             if (_strcmpi(name, "language") == 0)
@@ -256,7 +256,7 @@ wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const c
                         }
                         else if (json_object_is_type(obj_val, json_type_int))
                         {
-                            char *name = json_object_iter_peek_name(&it);
+                            const char *name = json_object_iter_peek_name(&it);
                             int32_t value = json_object_get_int(obj_val);
 
                             // Copy the language_id
@@ -477,8 +477,8 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
                         struct json_object *obj_val = json_object_iter_peek_value(&it);
                         if (json_object_is_type(obj_val, json_type_string))
                         {
-                            char *name = json_object_iter_peek_name(&it);
-                            char *value = json_object_get_string(obj_val);
+                            const char *name = json_object_iter_peek_name(&it);
+                            const char *value = json_object_get_string(obj_val);
 
                             // Copy alphabet
                             if (_strcmpi(name, "alphabet") == 0)
