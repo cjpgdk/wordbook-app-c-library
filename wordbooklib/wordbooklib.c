@@ -18,7 +18,7 @@
 // get destination language id from dict_id
 int get_destination_language_id_from_dict_id(const char *dict_id)
 {
-    int len = strlen(dict_id);
+    size_t len = strlen(dict_id);
     growable_string_t gstr = growable_string_new(len);
     if (gstr == NULL)
     {
@@ -48,7 +48,7 @@ int get_destination_language_id_from_dict_id(const char *dict_id)
 // get source language id from dict_id
 int get_source_language_id_from_dict_id(const char *dict_id)
 {
-    int len = strlen(dict_id);
+    size_t len = strlen(dict_id);
     growable_string_t gstr = growable_string_new(len);
     if (gstr == NULL)
     {
@@ -381,7 +381,7 @@ void initialize_array_wordbook_suggestions(wordbook_array_suggestions_t suggest_
     suggest_array_struct_ptr->size = initial_size;
 
     // Initialize all values of the array to 0
-    for (int i = 0; i < initial_size; i++)
+    for (size_t i = 0; i < initial_size; i++)
     {
         memset(&suggest_array_struct_ptr->suggestions[i], 0, sizeof(struct wordbook_suggestion));
     }
@@ -409,7 +409,7 @@ void wordbook_array_suggestion_free(wordbook_array_suggestions_t suggest_array)
     {
         if (suggest_array->suggestions != NULL)
         {
-            for (int i = 0; i < suggest_array->count; i++)
+            for (size_t i = 0; i < suggest_array->count; i++)
             {
                 wordbook_suggestion_free_props(suggest_array->suggestions[i]);
             }
@@ -659,7 +659,7 @@ void initialize_array_wordbook_dictionary(wordbook_array_dictionary_t dict_array
     dict_array_struct_ptr->size = initial_size;
 
     // Initialize all values of the array to 0
-    for (int i = 0; i < initial_size; i++)
+    for (size_t i = 0; i < initial_size; i++)
     {
         memset(&dict_array_struct_ptr->dicts[i], 0, sizeof(struct wordbook_dictionary));
     }
@@ -672,7 +672,7 @@ void wordbook_array_dictionary_free(wordbook_array_dictionary_t dict_array)
     {
         if (dict_array->dicts != NULL)
         {
-            for (int i = 0; i < dict_array->count; i++)
+            for (size_t i = 0; i < dict_array->count; i++)
             {
                 wordbook_dictionary_free_props(dict_array->dicts[i]);
             }
