@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
     if (print_suggests)
     {
-        curl_download_result_t res = wordbook_get_suggestions_json(print_suggest);
+        curl_download_result res = wordbook_get_suggestions_json(print_suggest);
         printf("%s", res.ptr);
         free(res.ptr);
         res = wordbook_get_suggestions_dict_json(print_suggest, "1-2");
@@ -157,18 +157,18 @@ void print_all_dictionaries(const char *search)
 // convert all chars to lower and reutrn strstr (Return cannot be used! Only checked!)
 char *strstr_i(const char *s1, const char *s2)
 {
-    char *_s1 = s1;
-    char *_s2 = s2;
-    int len1 = strlen(_s1);
-    int len2 = strlen(_s2);
+    char *p1 = s1;
+    char *p2 = s2;
+    int len1 = strlen(p1);
+    int len2 = strlen(p2);
     for (size_t i = 0; i < len1; i++)
     {
-        _s1[i] = tolower(_s1[i]);
+        p1[i] = tolower(p2[i]);
     }
 
     for (size_t i = 0; i < len2; i++)
     {
-        _s2[i] = tolower(_s2[i]);
+        p2[i] = tolower(p2[i]);
     }
-    return strstr(_s1, _s2);
+    return strstr(p1, p2);
 }

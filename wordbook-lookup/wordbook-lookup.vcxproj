@@ -171,6 +171,9 @@
     <ClInclude Include="wordbook-lookup.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Update="D:\Projects\wordbook.cjpg.app\libraries\c\wordbooklib\curlhelper.c">
+      <FileType>CppCode</FileType>
+    </ClCompile>
     <ClCompile Update="D:\Projects\wordbook.cjpg.app\libraries\c\wordbooklib\growablestring.c">
       <FileType>CppCode</FileType>
     </ClCompile>

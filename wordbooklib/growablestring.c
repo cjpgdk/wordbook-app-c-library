@@ -8,7 +8,9 @@ growable_string_t growable_string_new(int space)
     growable_string_t result;
     result = (growable_string_t)malloc(sizeof(struct growable_string));
     if (result == NULL)
+    {
         return NULL;
+    }
     if (!growable_string_init(result, space))
     {
         free(result);
@@ -26,7 +28,9 @@ int growable_string_append_cstr(growable_string_t dest, const char* s)
     /* The new length is the old length plus the size of our string, plus
        one for the null at the end.  */
     if (growable_string_resize(dest, dest->length + len) == NULL)
+    {
         return 0;
+    }
     strcpy(dest->s + dest->length, s);
     dest->length += len;
     return 1;
@@ -81,6 +85,12 @@ growable_string_t growable_string_resize(growable_string_t gs, int space)
 
 void growable_string_delete(growable_string_t gs)
 {
-    free(gs->s);
-    free(gs);
+    if (gs != NULL)
+    {
+        if (gs->s != NULL)
+        {
+            free(gs->s);
+        }
+        free(gs);
+    }
 }

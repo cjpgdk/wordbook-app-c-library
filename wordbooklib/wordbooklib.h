@@ -2,31 +2,12 @@
 #define WORDBOOOKLIB_H
 
 #include <stdio.h>
+#include "curlhelper.h"
 
 #define API_BASE_URL "https://wordbook.cjpg.app"
 #define API_PATH_DICTIONARIES "/dictionaries"
 #define API_PATH_SUGGESTIONS "/suggestions"
 #define API_PATH_DEFINITIONS "/definitions"
-
-#ifndef WORDBOOK_LIB_USER_AGENT
-// User-Agent to use in requests
-#define WORDBOOK_LIB_USER_AGENT "C-Wordbook-Library/1.0"
-#endif // !WORDBOOK_LIB_USER_AGENT
-
-/**
- * struct for downloaded data!
- */
-typedef struct curl_download_result
-{
-    /**
-     * pointer to a \0 terminated string of the data in memory
-     */
-    char *ptr;
-    /**
-     * the length
-     */
-    size_t len;
-} curl_download_result_t;
 
 /**
  * struct for downloaded dictionaries!
@@ -79,17 +60,6 @@ typedef struct wordbook_array_dictionary
     size_t count;
 } *wordbook_array_dictionary_t;
 
-/** perform a get request.
- *
- * NOTE* that curl_download_result countains a pointer that needs
- *       to freed when you are done with it
- *
- * @param url url to request
- * @returns a curl_download_result
- * @see curl_download_result
- */
-curl_download_result_t wordbook_perform_http_get(const char *url);
-
 /** download all available dictionaries from wordbook.cjpg.app.
  *
  * NOTE* that curl_download_result countains a pointer that needs
@@ -98,7 +68,7 @@ curl_download_result_t wordbook_perform_http_get(const char *url);
  * @returns a curl_download_result
  * @see curl_download_result
  */
-curl_download_result_t wordbook_get_dictionaries_json();
+curl_download_result wordbook_get_dictionaries_json();
 
 // free memory used by the 'wordbook_array_dictionary'
 void wordbook_array_dictionary_free(struct wordbook_array_dictionary *dict_array);
@@ -125,8 +95,8 @@ void wordbook_dictionary_free_props(struct wordbook_dictionary dict);
 void wordbook_dictionary_free(wordbook_dictionary_t dict_struct_ptr);
 
 // get suggestions from wordbook.cjpg.app, based on the query
-curl_download_result_t wordbook_get_suggestions_json(const char *query);
+curl_download_result wordbook_get_suggestions_json(const char *query);
 // get suggestions from wordbook.cjpg.app, based on the query and the selected dictionary
-curl_download_result_t wordbook_get_suggestions_dict_json(const char *query, const char *dict_id);
+curl_download_result wordbook_get_suggestions_dict_json(const char *query, const char *dict_id);
 
 #endif // !WORDBOOOKLIB_H

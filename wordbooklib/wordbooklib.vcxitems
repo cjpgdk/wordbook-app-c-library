@@ -14,10 +14,12 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)curlhelper.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)growablestring.c" />
     <ClCompile Include="$(MSBuildThisFileDirectory)wordbooklib.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)curlhelper.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)growablestring.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)wordbooklib.h" />
   </ItemGroup>

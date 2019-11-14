@@ -1,10 +1,10 @@
-#define CURL_STATICLIB
+
 #define _CRT_SECURE_NO_WARNINGS
 #include "wordbooklib.h"
+#include "curlhelper.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <curl/curl.h>
 #include <json-c/json.h>
 #include "growablestring.h"
 
@@ -14,7 +14,7 @@ void wordbook_get_suggestions()
 }
 
 // get suggestions from wordbook.cjpg.app, based on the query and the selected dictionary
-curl_download_result_t wordbook_get_suggestions_dict_json(const char *query, const char *dict_id)
+curl_download_result wordbook_get_suggestions_dict_json(const char *query, const char *dict_id)
 {
     // dictionaryId
     int len = strlen(API_BASE_URL API_PATH_SUGGESTIONS "?");
@@ -26,13 +26,13 @@ curl_download_result_t wordbook_get_suggestions_dict_json(const char *query, con
     growable_string_append_cstr(gstr, query);
     growable_string_append_cstr(gstr, "&language=");
     growable_string_append_cstr(gstr, dict_id);
-    curl_download_result_t result = wordbook_perform_http_get(gstr->s);
+    curl_download_result result = wordbook_perform_http_get(gstr->s);
     growable_string_delete(gstr);
     return result;
 }
 
 // get suggestions from wordbook.cjpg.app, based on the query
-curl_download_result_t wordbook_get_suggestions_json(const char *query)
+curl_download_result wordbook_get_suggestions_json(const char *query)
 {
     int len = strlen(API_BASE_URL API_PATH_SUGGESTIONS "?");
     len += strlen(query);
@@ -41,7 +41,7 @@ curl_download_result_t wordbook_get_suggestions_json(const char *query)
     growable_string_append_cstr(gstr, API_PATH_SUGGESTIONS);
     growable_string_append_cstr(gstr, "?query=");
     growable_string_append_cstr(gstr, query);
-    curl_download_result_t result = wordbook_perform_http_get(gstr->s);
+    curl_download_result result = wordbook_perform_http_get(gstr->s);
     growable_string_delete(gstr);
     return result;
 }
@@ -50,11 +50,11 @@ curl_download_result_t wordbook_get_suggestions_json(const char *query)
 wordbook_array_dictionary_t wordbook_get_dictionaries()
 {
     // get the raw json data
-    curl_download_result_t json_result;
+    curl_download_result json_result;
     json_result = wordbook_get_dictionaries_json();
 
     // declare the array to hold the dictionaries
-    wordbook_array_dictionary_t *dict_array = (wordbook_array_dictionary_t)malloc(sizeof(struct wordbook_array_dictionary));
+    wordbook_array_dictionary_t dict_array = (wordbook_array_dictionary_t)malloc(sizeof(struct wordbook_array_dictionary));
 
     int dictionaries_count = 0;
     // make sure we got a pointer
@@ -329,73 +329,8 @@ void wordbook_dictionary_free(wordbook_dictionary_t dict_struct_ptr)
     }
 }
 
-
-// function used with: CURLOPT_WRITEFUNCTION
-size_t wordbook_curl_write_function(void *ptr, size_t size, size_t nmemb, curl_download_result_t *s)
-{
-    // calculate the length of the data
-    size_t dlen = size * nmemb;
-    size_t nlen = s->len + dlen;
-    // call realloc to get the required amount of memory
-    s->ptr = realloc(s->ptr, nlen + 1);
-    // check if we failed
-    if (s->ptr == NULL) {
-        // exit if failed
-        fprintf(stderr, "realloc() failed in curl_write_function\n");
-        exit(EXIT_FAILURE);
-    }
-    // copy the source 'ptr' into our stuct ptr
-    memcpy(s->ptr + s->len, ptr, size * nmemb);
-    // terminate the string
-    s->ptr[nlen] = '\0';
-    // set the new langth of the string
-    s->len = nlen;
-    return dlen;
-}
-
-// function used to initialize the curl_download_result
-void initialize_dl_result(curl_download_result_t *s) {
-    // set length to 0
-    s->len = 0;
-    // alocate a minimal chunk of memory
-    s->ptr = malloc(s->len + 1);
-    // check if we failed
-    if (s->ptr == NULL) {
-        fprintf(stderr, "malloc() failed in initialize_dl_result\n");
-        exit(EXIT_FAILURE);
-    }
-    // terminate the string
-    s->ptr[0] = '\0';
-}
-
 // download all available dictionaries from wordbook.cjpg.app. 
-curl_download_result_t wordbook_get_dictionaries_json()
+curl_download_result wordbook_get_dictionaries_json()
 {
     return wordbook_perform_http_get(API_BASE_URL API_PATH_DICTIONARIES);
-}
-
-// perform an get request.
-curl_download_result_t wordbook_perform_http_get(const char *url)
-{
-    CURL * curl;
-    CURLcode res;
-    curl_download_result_t s;
-    curl_global_init(CURL_GLOBAL_DEFAULT);
-    curl = curl_easy_init();
-    if (curl) {
-        initialize_dl_result(&s);
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, WORDBOOK_LIB_USER_AGENT);
-        curl_easy_setopt(curl, CURLOPT_URL, url);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, wordbook_curl_write_function);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
-        res = curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
-    }
-    curl_global_cleanup();
-    if (res != CURLE_OK)
-    {
-        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-        exit(EXIT_FAILURE);
-    }
-    return s;
 }
