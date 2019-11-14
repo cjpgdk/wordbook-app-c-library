@@ -13,7 +13,6 @@
 #define WORDBOOK_LIB_USER_AGENT "C-Wordbook-Library/1.0"
 #endif // !WORDBOOK_LIB_USER_AGENT
 
-
 /**
  * struct for downloaded data!
  */
@@ -27,7 +26,7 @@ typedef struct curl_download_result
      * the length
      */
     size_t len;
-} curl_download_result;
+} curl_download_result_t;
 
 /**
  * struct for downloaded dictionaries!
@@ -61,7 +60,7 @@ typedef struct wordbook_dictionary
      * eg. https://wordbook.cjpg.app/definitions?word=00databaseurl&src_language_id=7&dest_language_id=11
      */
     char *url;
-} wordbook_dictionary;
+} *wordbook_dictionary_t;
 
 /**
  * struct 'ARRAY' of the dictionaries!
@@ -69,7 +68,7 @@ typedef struct wordbook_dictionary
 typedef struct wordbook_array_dictionary
 {
     // array of dictionaries 
-    wordbook_dictionary *dicts;
+    wordbook_dictionary_t dicts;
     /**
      * current size of the '*dicts'
      * should be the same as count, but used for allocating memory
@@ -78,7 +77,7 @@ typedef struct wordbook_array_dictionary
     size_t size;
     // the current count of '*dicts', use this in loops! 
     size_t count;
-} wordbook_array_dictionary;
+} *wordbook_array_dictionary_t;
 
 /** perform a get request.
  *
@@ -89,7 +88,7 @@ typedef struct wordbook_array_dictionary
  * @returns a curl_download_result
  * @see curl_download_result
  */
-curl_download_result wordbook_perform_http_get(const char *url);
+curl_download_result_t wordbook_perform_http_get(const char *url);
 
 /** download all available dictionaries from wordbook.cjpg.app.
  *
@@ -99,10 +98,10 @@ curl_download_result wordbook_perform_http_get(const char *url);
  * @returns a curl_download_result
  * @see curl_download_result
  */
-curl_download_result wordbook_get_dictionaries_json();
+curl_download_result_t wordbook_get_dictionaries_json();
 
 // free memory used by the 'wordbook_array_dictionary'
-void wordbook_array_dictionary_free(wordbook_array_dictionary *dict_array);
+void wordbook_array_dictionary_free(struct wordbook_array_dictionary *dict_array);
 
 /** get all available dictionaries
  * 
@@ -112,17 +111,18 @@ void wordbook_array_dictionary_free(wordbook_array_dictionary *dict_array);
  * @returns a wordbook_array_dictionary
  * @see wordbook_array_dictionary
  */
-wordbook_array_dictionary *wordbook_get_dictionaries();
+wordbook_array_dictionary_t wordbook_get_dictionaries();
 
 // initialize the array struct for 'wordbook_dictionary' eith a given size!
-void initialize_array_wordbook_dictionary(wordbook_array_dictionary *dict_array, size_t initial_size);
+void initialize_array_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_ptr, size_t initial_size);
 
 // Insert a 'wordbook_dictionary' into an wordbook_array_dictionary
-void insert_wordbook_dictionary(wordbook_array_dictionary *dict_array, wordbook_dictionary dict);
+void insert_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_ptr, struct wordbook_dictionary dict);
 
 // [Internal]: free memory used by wordbook_dictionary props
-void wordbook_dictionary_free_props(wordbook_dictionary dict);
+void wordbook_dictionary_free_props(struct wordbook_dictionary dict);
 // [Internal]: free memory used by wordbook_dictionary
-void wordbook_dictionary_free(wordbook_dictionary *dict);
+void wordbook_dictionary_free(wordbook_dictionary_t dict_struct_ptr);
+
 
 #endif // !WORDBOOOKLIB_H

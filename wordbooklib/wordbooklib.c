@@ -8,14 +8,14 @@
 #include <json-c/json.h>
 
 // get all available dictionaries
-wordbook_array_dictionary *wordbook_get_dictionaries()
+wordbook_array_dictionary_t wordbook_get_dictionaries()
 {
     // get the raw json data
-    curl_download_result json_result;
+    curl_download_result_t json_result;
     json_result = wordbook_get_dictionaries_json();
 
     // declare the array to hold the dictionaries
-    wordbook_array_dictionary *dict_array = (wordbook_array_dictionary *)malloc(sizeof(wordbook_array_dictionary));
+    wordbook_array_dictionary_t *dict_array = (wordbook_array_dictionary_t)malloc(sizeof(struct wordbook_array_dictionary));
 
     int dictionaries_count = 0;
     // make sure we got a pointer
@@ -43,7 +43,7 @@ wordbook_array_dictionary *wordbook_get_dictionaries()
                 json_object *obj = json_object_array_get_idx(json_obj, i);
 
                 // create a temperary dict.
-                wordbook_dictionary dict = (wordbook_dictionary){ NULL,  NULL, NULL, NULL, NULL, NULL };
+                struct wordbook_dictionary dict = (struct wordbook_dictionary){ NULL,  NULL, NULL, NULL, NULL, NULL };
 
                 // lets just confirm this is an object
                 if (json_object_is_type(obj, json_type_object))
@@ -144,97 +144,97 @@ wordbook_array_dictionary *wordbook_get_dictionaries()
 }
 
 // Insert a 'wordbook_dictionary' into an wordbook_array_dictionary
-void insert_wordbook_dictionary(wordbook_array_dictionary *dict_array, wordbook_dictionary dict)
+void insert_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_ptr, struct wordbook_dictionary dict)
 {
     // increment the size, if needed.
-    if (dict_array->count == dict_array->size)
+    if (dict_array_struct_ptr->count == dict_array_struct_ptr->size)
     {
-        // only increment by 5, no need to take more than needed.
-        dict_array->size += 5;
-        dict_array->dicts = (wordbook_dictionary *)realloc(dict_array->dicts, dict_array->size * sizeof(wordbook_dictionary));
-        if (dict_array->dicts == NULL)
+        dict_array_struct_ptr->size *= 2;
+        dict_array_struct_ptr->dicts = 
+            (wordbook_dictionary_t)realloc(dict_array_struct_ptr->dicts, dict_array_struct_ptr->size * sizeof(struct wordbook_dictionary));
+        if (dict_array_struct_ptr->dicts == NULL)
         {
             fprintf(stderr, "realloc() failed in insert_wordbook_dictionary\n");
             exit(EXIT_FAILURE);
         }
         // Initialize the last/new elements of the reallocated array
-        for (unsigned int i = dict_array->count; i < dict_array->size; i++)
+        for (unsigned int i = dict_array_struct_ptr->count; i < dict_array_struct_ptr->size; i++)
         {
-            memset(&dict_array->dicts[i], 0, sizeof(wordbook_dictionary));
+            memset(&dict_array_struct_ptr->dicts[i], 0, sizeof(struct wordbook_dictionary));
         }
     }
 
     // simplify the code, by collecting the index.
-    size_t index = dict_array->count;
+    size_t index = dict_array_struct_ptr->count;
 
     // Copy the alphabet.
     size_t len = strlen(dict.alphabet) + 1;
-    dict_array->dicts[index].alphabet = malloc(len);
-    if (dict_array->dicts[index].alphabet != NULL)
+    dict_array_struct_ptr->dicts[index].alphabet = malloc(len);
+    if (dict_array_struct_ptr->dicts[index].alphabet != NULL)
     {
-        strcpy(dict_array->dicts[index].alphabet, dict.alphabet);
+        strcpy(dict_array_struct_ptr->dicts[index].alphabet, dict.alphabet);
     }
 
     // Copy the id.
     len = strlen(dict.id) + 1;
-    dict_array->dicts[index].id = malloc(len);
-    if (dict_array->dicts[index].id != NULL)
+    dict_array_struct_ptr->dicts[index].id = malloc(len);
+    if (dict_array_struct_ptr->dicts[index].id != NULL)
     {
-        strcpy(dict_array->dicts[index].id, dict.id);
+        strcpy(dict_array_struct_ptr->dicts[index].id, dict.id);
     }
 
     // Copy the info.
     len = strlen(dict.info) + 1;
-    dict_array->dicts[index].info = malloc(len);
-    if (dict_array->dicts[index].info != NULL)
+    dict_array_struct_ptr->dicts[index].info = malloc(len);
+    if (dict_array_struct_ptr->dicts[index].info != NULL)
     {
-        strcpy(dict_array->dicts[index].info, dict.info);
+        strcpy(dict_array_struct_ptr->dicts[index].info, dict.info);
     }
 
     // Copy the long_name.
     len = strlen(dict.long_name) + 1;
-    dict_array->dicts[index].long_name = malloc(len);
-    if (dict_array->dicts[index].long_name != NULL)
+    dict_array_struct_ptr->dicts[index].long_name = malloc(len);
+    if (dict_array_struct_ptr->dicts[index].long_name != NULL)
     {
-        strcpy(dict_array->dicts[index].long_name, dict.long_name);
+        strcpy(dict_array_struct_ptr->dicts[index].long_name, dict.long_name);
     }
 
     // Copy the short_name.
     len = strlen(dict.short_name) + 1;
-    dict_array->dicts[index].short_name = malloc(len);
-    if (dict_array->dicts[index].short_name != NULL)
+    dict_array_struct_ptr->dicts[index].short_name = malloc(len);
+    if (dict_array_struct_ptr->dicts[index].short_name != NULL)
     {
-        strcpy(dict_array->dicts[index].short_name, dict.short_name);
+        strcpy(dict_array_struct_ptr->dicts[index].short_name, dict.short_name);
     }
 
     // Copy the url.
     len = strlen(dict.url) + 1;
-    dict_array->dicts[index].url = malloc(len);
-    if (dict_array->dicts[index].url != NULL)
+    dict_array_struct_ptr->dicts[index].url = malloc(len);
+    if (dict_array_struct_ptr->dicts[index].url != NULL)
     {
-        strcpy(dict_array->dicts[index].url, dict.url);
+        strcpy(dict_array_struct_ptr->dicts[index].url, dict.url);
     }
 
-    dict_array->count++;
+    dict_array_struct_ptr->count++;
 }
 
 // initialize the array struct for 'wordbook_dictionary' eith a given size!
-void initialize_array_wordbook_dictionary(wordbook_array_dictionary *dict_array, size_t initial_size)
+void initialize_array_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_ptr, size_t initial_size)
 {
     // Allocate initial space
-    dict_array->dicts = (wordbook_dictionary *)malloc(initial_size * sizeof(wordbook_dictionary));
-    dict_array->count = 0;
-    dict_array->size = initial_size;
+    dict_array_struct_ptr->dicts = (wordbook_dictionary_t)malloc(initial_size * sizeof(struct wordbook_dictionary));
+    dict_array_struct_ptr->count = 0;
+    dict_array_struct_ptr->size = initial_size;
 
     // Initialize all values of the array to 0
     for (int i = 0; i < initial_size; i++)
     {
-        memset(&dict_array->dicts[i], 0, sizeof(wordbook_dictionary));
+        memset(&dict_array_struct_ptr->dicts[i], 0, sizeof(struct wordbook_dictionary));
     }
 }
 
 // free memory used by the 'wordbook_array_dictionary'
-void wordbook_array_dictionary_free(wordbook_array_dictionary *dict_array)
+void wordbook_array_dictionary_free(struct wordbook_array_dictionary *dict_array)
 {
     if (dict_array != NULL)
     {
@@ -252,7 +252,7 @@ void wordbook_array_dictionary_free(wordbook_array_dictionary *dict_array)
 
 // free memory used by props in 'wordbook_dictionary'
 // make sure all props are NULL or a valid pointer.
-void wordbook_dictionary_free_props(wordbook_dictionary dict)
+void wordbook_dictionary_free_props(struct wordbook_dictionary dict)
 {
     if (dict.alphabet)
     {
@@ -281,18 +281,18 @@ void wordbook_dictionary_free_props(wordbook_dictionary dict)
 }
 
 // free memory used by 'wordbook_dictionary'
-void wordbook_dictionary_free(wordbook_dictionary *dict)
+void wordbook_dictionary_free(wordbook_dictionary_t dict_struct_ptr)
 {
-    wordbook_dictionary_free_props(*dict);
-    if (dict != NULL)
+    wordbook_dictionary_free_props(*dict_struct_ptr);
+    if (dict_struct_ptr != NULL)
     {
-        free(dict);
+        free(dict_struct_ptr);
     }
 }
 
 
 // function used with: CURLOPT_WRITEFUNCTION
-size_t wordbook_curl_write_function(void *ptr, size_t size, size_t nmemb, curl_download_result *s)
+size_t wordbook_curl_write_function(void *ptr, size_t size, size_t nmemb, curl_download_result_t *s)
 {
     // calculate the length of the data
     size_t dlen = size * nmemb;
@@ -315,7 +315,7 @@ size_t wordbook_curl_write_function(void *ptr, size_t size, size_t nmemb, curl_d
 }
 
 // function used to initialize the curl_download_result
-void initialize_dl_result(curl_download_result *s) {
+void initialize_dl_result(curl_download_result_t *s) {
     // set length to 0
     s->len = 0;
     // alocate a minimal chunk of memory
@@ -330,17 +330,17 @@ void initialize_dl_result(curl_download_result *s) {
 }
 
 // download all available dictionaries from wordbook.cjpg.app. 
-curl_download_result wordbook_get_dictionaries_json()
+curl_download_result_t wordbook_get_dictionaries_json()
 {
     return wordbook_perform_http_get(API_BASE_URL API_PATH_DICTIONARIES);
 }
 
 // perform an get request.
-curl_download_result wordbook_perform_http_get(const char *url)
+curl_download_result_t wordbook_perform_http_get(const char *url)
 {
     CURL * curl;
     CURLcode res;
-    curl_download_result s;
+    curl_download_result_t s;
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
     if (curl) {
