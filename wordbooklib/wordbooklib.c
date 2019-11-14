@@ -329,16 +329,18 @@ void insert_wordbook_suggestion(wordbook_array_suggestions_t suggest_array_struc
 
         suggest_array_struct_ptr->size *= 2;
 
-        suggest_array_struct_ptr->suggestions = (wordbook_suggestion_t)realloc(
+        wordbook_suggestion_t tmp = (wordbook_suggestion_t)realloc(
             suggest_array_struct_ptr->suggestions,
             suggest_array_struct_ptr->size * sizeof(struct wordbook_suggestion)
         );
 
-        if (suggest_array_struct_ptr->suggestions == NULL)
+        if (tmp == NULL)
         {
             fprintf(stderr, "realloc() failed in insert_wordbook_suggestion\n");
             exit(EXIT_FAILURE);
         }
+
+        suggest_array_struct_ptr->suggestions = tmp;
         // Initialize the last/new elements of the reallocated array
         for (unsigned int i = suggest_array_struct_ptr->count; i < suggest_array_struct_ptr->size; i++)
         {
@@ -383,7 +385,11 @@ void initialize_array_wordbook_suggestions(wordbook_array_suggestions_t suggest_
     // Initialize all values of the array to 0
     for (size_t i = 0; i < initial_size; i++)
     {
-        memset(&suggest_array_struct_ptr->suggestions[i], 0, sizeof(struct wordbook_suggestion));
+        // C6011
+        if (suggest_array_struct_ptr->suggestions)
+        {
+            memset(&suggest_array_struct_ptr->suggestions[i], 0, sizeof(struct wordbook_suggestion));
+        }
     }
 }
 
@@ -578,16 +584,18 @@ void insert_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_pt
 
         dict_array_struct_ptr->size *= 2;
 
-        dict_array_struct_ptr->dicts = (wordbook_dictionary_t)realloc(
+        wordbook_dictionary_t tmp = (wordbook_dictionary_t)realloc(
             dict_array_struct_ptr->dicts,
             dict_array_struct_ptr->size * sizeof(struct wordbook_dictionary)
         );
 
-        if (dict_array_struct_ptr->dicts == NULL)
+        if (tmp == NULL)
         {
             fprintf(stderr, "realloc() failed in insert_wordbook_dictionary\n");
             exit(EXIT_FAILURE);
         }
+
+        dict_array_struct_ptr->dicts = tmp;
         // Initialize the last/new elements of the reallocated array
         for (unsigned int i = dict_array_struct_ptr->count; i < dict_array_struct_ptr->size; i++)
         {
@@ -661,7 +669,11 @@ void initialize_array_wordbook_dictionary(wordbook_array_dictionary_t dict_array
     // Initialize all values of the array to 0
     for (size_t i = 0; i < initial_size; i++)
     {
-        memset(&dict_array_struct_ptr->dicts[i], 0, sizeof(struct wordbook_dictionary));
+        // C6011
+        if (dict_array_struct_ptr->dicts)
+        {
+            memset(&dict_array_struct_ptr->dicts[i], 0, sizeof(struct wordbook_dictionary));
+        }
     }
 }
 

@@ -91,12 +91,13 @@ growable_string_t growable_string_resize(growable_string_t gs, int space)
     {
         gs->allocated = new_allocated;
         /* We actually need more space.  */
-        gs->s = (char *)realloc(gs->s, gs->allocated);
-        if (gs->s == NULL)
+        char *tmp = (char *)realloc(gs->s, gs->allocated);
+        if (tmp == NULL)
         {
             free(gs);
             return NULL;
         }
+        gs->s = tmp;
     }
     return gs;
 }
