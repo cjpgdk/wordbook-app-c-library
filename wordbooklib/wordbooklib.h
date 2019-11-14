@@ -71,7 +71,7 @@ typedef struct wordbook_array_dictionary
 curl_download_result wordbook_get_dictionaries_json();
 
 // free memory used by the 'wordbook_array_dictionary'
-void wordbook_array_dictionary_free(struct wordbook_array_dictionary *dict_array);
+void wordbook_array_dictionary_free(wordbook_array_dictionary_t dict_array);
 
 /** get all available dictionaries
  * 
