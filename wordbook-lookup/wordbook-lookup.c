@@ -62,7 +62,8 @@ int main(int argc, char *argv[])
     }
 
     // print dictionaries.
-    if (print_dicts)
+    // if print_suggests that we ship and use the dict_id in the suggestions lookup
+    if (print_dicts && !print_suggests)
     {
         print_all_dictionaries(print_dict);
         return EXIT_SUCCESS;
@@ -70,12 +71,10 @@ int main(int argc, char *argv[])
 
     if (print_suggests)
     {
-        curl_download_result res = wordbook_get_suggestions_json(print_suggest);
-        printf("%s", res.ptr);
-        free(res.ptr);
-        res = wordbook_get_suggestions_dict_json(print_suggest, "1-2");
-        printf("%s", res.ptr);
-        free(res.ptr);
+        printf("%s\n", print_suggest);
+        printf("%s\n", print_dict);
+        printf("%s\n", NULL);
+        wordbook_get_suggestions(print_suggest, print_dict);
         return EXIT_SUCCESS;
     }
 
@@ -92,9 +91,15 @@ void print_help_text(const char *app)
     printf("Usage: ./%s\n\n", app);
     printf(" - ./%s -d\n", app);
     printf("\tList all dictionaries\n");
-    printf(" - ./%s -D [dictionary-search]\n", app);
+    printf(" - ./%s -D dictionary-search\n", app);
     printf("\tList only dictionaries where id, long name or short name matches 'dictionary-search'\n");
     printf("\teg. ./%s -D english\n", app);
+    printf(" - ./%s -s phrase\n", app);
+    printf("\tList all suggestions for the phrase (Max 25 will be returned)\n");
+    printf(" - ./%s -s phrase -D dictionary-id\n", app);
+    printf("\tList all suggestions for the phrase but only in the dictionary with id of dictionary-id.\n");
+    printf("\t * Max 25 will be returned\n");
+    printf("\teg. ./%s -s 'hello' -D 2-1\n", app);
 }
 
 // print all dictionaries

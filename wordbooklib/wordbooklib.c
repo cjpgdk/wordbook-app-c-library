@@ -1,22 +1,32 @@
 
 #define _CRT_SECURE_NO_WARNINGS
+#include "growablestring.h"
 #include "wordbooklib.h"
 #include "curlhelper.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <json-c/json.h>
-#include "growablestring.h"
 
-void wordbook_get_suggestions()
+void wordbook_get_suggestions(const char *query, const char *dict_id)
 {
-    
+    curl_download_result json_result;
+    if (dict_id == NULL)
+    {
+        json_result = wordbook_get_suggestions_json(query);
+    } 
+    else
+    {
+        json_result = wordbook_get_dictionary_suggestions_json(query, dict_id);
+    }
+
+    printf("%s\n", json_result.ptr);
+    free(json_result.ptr);
 }
 
 // get suggestions from wordbook.cjpg.app, based on the query and the selected dictionary
-curl_download_result wordbook_get_suggestions_dict_json(const char *query, const char *dict_id)
+curl_download_result wordbook_get_dictionary_suggestions_json(const char *query, const char *dict_id)
 {
-    // dictionaryId
     int len = strlen(API_BASE_URL API_PATH_SUGGESTIONS "?");
     len += strlen(query);
     growable_string_t gstr = growable_string_new(len);
