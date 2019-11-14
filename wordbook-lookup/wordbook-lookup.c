@@ -79,6 +79,8 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }
 
+    // if we get here we are missing some args, show help
+    print_help_text(argv[0]);
     return EXIT_SUCCESS;
 }
 
