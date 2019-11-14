@@ -31,14 +31,14 @@ int main(int argc, char *argv[])
          print_suggests = false;
     char* print_dict = NULL, *print_suggest = NULL;
     char c;
-    while ((c = getopt(argc, argv, "D:ds:h")) != -1)
+    while ((c = getopt(argc, argv, "L:ls:h")) != -1)
     {
         switch (c)
         {
-        case 'd':
+        case 'l':
             print_dicts = true;
             break;
-        case 'D':
+        case 'L':
             print_dicts = true;
             print_dict = optarg;
             break;
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     }
 
     // print dictionaries.
-    // if print_suggests than we skip and use the dict_id in the suggestions lookup
+    // if print_suggests then we skip and use the dict_id in the suggestions lookup
     if (print_dicts && !print_suggests)
     {
         print_all_dictionaries(print_dict);
@@ -106,9 +106,9 @@ int main(int argc, char *argv[])
 void print_help_text(const char *app)
 {
     printf("Usage: ./%s\n\n", app);
-    printf(" - ./%s -d\n", app);
+    printf(" - ./%s -l\n", app);
     printf("\tList all dictionaries\n");
-    printf(" - ./%s -D dictionary-search\n", app);
+    printf(" - ./%s -L dictionary-search\n", app);
     printf("\tList only dictionaries where id, long name or short name matches 'dictionary-search'\n");
     printf("\teg. ./%s -D english\n", app);
     printf(" - ./%s -s phrase\n", app);

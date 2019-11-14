@@ -100,18 +100,14 @@ typedef struct wordbook_array_dictionary
     size_t count;
 } *wordbook_array_dictionary_t;
 
-/** download all available dictionaries from wordbook.cjpg.app.
- *
- * NOTE* that curl_download_result countains a pointer that needs
- *       to freed when you are done with it
- *
- * @returns a curl_download_result
- * @see curl_download_result
- */
-curl_download_result wordbook_get_dictionaries_json();
 
-// free memory used by the 'wordbook_array_dictionary'
-void wordbook_array_dictionary_free(wordbook_array_dictionary_t dict_array);
+/*
+ * dictionary methods!
+ *
+ * Methods marked as internal are only exposed becouse why not! But they are not ment to be used outside
+ * the library.
+ */
+
 
 /** get all available dictionaries
  * 
@@ -122,51 +118,85 @@ void wordbook_array_dictionary_free(wordbook_array_dictionary_t dict_array);
  * @see wordbook_array_dictionary
  */
 wordbook_array_dictionary_t wordbook_get_dictionaries();
+/** free memory used by the 'wordbook_array_dictionary'
+ *
+ * @param dict_array the wordbook_array_dictionary array struct to free from memory
+ */
+void wordbook_array_dictionary_free(wordbook_array_dictionary_t dict_array);
+/** download all available dictionaries from wordbook.cjpg.app.
+ *
+ * NOTE* that curl_download_result countains a pointer that needs
+ *       to freed when you are done with it
+ *
+ * @returns a curl_download_result with the raw json data.
+ * @see curl_download_result
+ */
+curl_download_result wordbook_get_dictionaries_json();
 
-// initialize the array struct for 'wordbook_dictionary' eith a given size!
+// [Internal]: initialize the array struct for 'wordbook_dictionary' eith a given size!
 void initialize_array_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_ptr, size_t initial_size);
-
-// Insert a 'wordbook_dictionary' into an wordbook_array_dictionary
+// [Internal]: Insert a 'wordbook_dictionary' into an wordbook_array_dictionary
 void insert_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_ptr, struct wordbook_dictionary dict);
-
-// [Internal]: free memory used by wordbook_dictionary props
+// [Internal]: free memory used by the properties of wordbook_dictionary
 void wordbook_dictionary_free_props(struct wordbook_dictionary dict);
 // [Internal]: free memory used by wordbook_dictionary
 void wordbook_dictionary_free(wordbook_dictionary_t dict_struct_ptr);
 
 
-wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const char *dict_id);
+/*
+ * suggestion methods!
+ *
+ * Methods marked as internal are only exposed becouse why not! But they are not ment to be used outside 
+ * the library.
+ */
 
-/** get suggestions from wordbook.cjpg.app, based on the query
+
+
+/** get suggestions for a word or phrase.
+ *
+ * NOTE* wordbook_array_suggestions countains pointers that needs
+ *       to be freed before you exit, call 'wordbook_array_suggestion_free(...)'
+ *
+ * @param query the word or phrase to lookup
+ * @param dict_id the dictinoary id to use for the lookup, if NULL it's ignored
+ * @returns a wordbook_array_suggestions
+ * @see wordbook_array_suggestions
+ */
+wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const char *dict_id);
+/** free memory used by the 'wordbook_array_suggestions'
+ * 
+ * @param suggest_array the wordbook_array_suggestions array struct to free from memory
+ */
+void wordbook_array_suggestion_free(wordbook_array_suggestions_t suggest_array);
+/**  get suggestions from wordbook.cjpg.app, based on the query
  *
  * NOTE* that curl_download_result countains a pointer that needs
  *       to freed when you are done with it
  *
- * @returns a curl_download_result
+ * @param query the word or phrase to lookup
+ * @returns a curl_download_result with the raw json data. Return is limited to 25 words!
  * @see curl_download_result
  */
 curl_download_result wordbook_get_suggestions_json(const char *query);
-
 /** get suggestions from wordbook.cjpg.app, based on the query and the selected dictionary
  *
  * NOTE* that curl_download_result countains a pointer that needs
  *       to freed when you are done with it
  *
- * @returns a curl_download_result
- * @see curl_download_result
+ * @param query the word or phrase to lookup
+ * @param dict_id the dictinoary id to use for the lookup, if NULL it's ignored
+ * @returns a curl_download_result with the raw json data. Return is limited to 25 words!
+ * @see curl_download_result 
  */
 curl_download_result wordbook_get_dictionary_suggestions_json(const char *query, const char *dict_id);
 
-// initialize the array struct for 'wordbook_suggestion' with a given size!
+// [Internal]: initialize the array struct for 'wordbook_suggestion' with a given size!
 void initialize_array_wordbook_suggestions(wordbook_array_suggestions_t suggest_array_struct_ptr, size_t initial_size);
-
-// free memory used by props in 'wordbook_suggestion'
-// make sure all props are NULL or a valid pointer.
+// [Internal]: free memory used by the properties in 'wordbook_suggestion'
 void wordbook_suggestion_free_props(struct wordbook_suggestion suggest);
-
-// Insert a 'wordbook_suggestion' into an wordbook_array_suggestions
+// [Internal]: Insert a 'wordbook_suggestion' into an wordbook_array_suggestions
 void insert_wordbook_suggestion(wordbook_array_suggestions_t suggest_array_struct_ptr, struct wordbook_suggestion suggest);
-// free memory used by the 'wordbook_array_suggestions'
-void wordbook_array_suggestion_free(wordbook_array_suggestions_t suggest_array);
+
+
 
 #endif // !WORDBOOOKLIB_H

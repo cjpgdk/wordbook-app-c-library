@@ -1,4 +1,3 @@
-
 #define _CRT_SECURE_NO_WARNINGS
 #include "growablestring.h"
 #include "wordbooklib.h"
@@ -7,6 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <json-c/json.h>
+
+
+
+
+/*****************************
+ * suggestion API methods!
+ *****************************/
 
 wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const char *dict_id)
 {
