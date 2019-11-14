@@ -27,10 +27,11 @@ int main(int argc, char *argv[])
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-    bool print_dicts = false, print_help = false;
-    char *print_dict = NULL;
+    bool print_dicts = false, print_help = false, 
+         print_suggests = false;
+    char* print_dict = NULL, *print_suggest = NULL;
     char c;
-    while ((c = getopt(argc, argv, "D:dh")) != -1)
+    while ((c = getopt(argc, argv, "D:ds:h")) != -1)
     {
         switch (c)
         {
@@ -40,6 +41,10 @@ int main(int argc, char *argv[])
         case 'D':
             print_dicts = true;
             print_dict = optarg;
+            break;
+        case 's':
+            print_suggests = true;
+            print_suggest = optarg;
             break;
         case 'h':
             print_help = true;
@@ -63,6 +68,17 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }
 
+    if (print_suggests)
+    {
+        curl_download_result_t res = wordbook_get_suggestions_json(print_suggest);
+        printf("%s", res.ptr);
+        free(res.ptr);
+        res = wordbook_get_suggestions_dict_json(print_suggest, "1-2");
+        printf("%s", res.ptr);
+        free(res.ptr);
+        return EXIT_SUCCESS;
+    }
+
     return EXIT_SUCCESS;
 }
 
@@ -83,13 +99,13 @@ void print_help_text(const char *app)
 void print_all_dictionaries(const char *search)
 {
     // download all dictionaries 
-    wordbook_array_dictionary* dict_array;
+   struct wordbook_array_dictionary *dict_array;
     dict_array = wordbook_get_dictionaries();
 
     // loop over all dictionaries, and print their info!
     for (size_t i = 0; i < dict_array->count; i++)
     {
-        wordbook_dictionary dict = dict_array->dicts[i];
+        struct wordbook_dictionary dict = dict_array->dicts[i];
         bool print = true;
         if (search != NULL)
         {

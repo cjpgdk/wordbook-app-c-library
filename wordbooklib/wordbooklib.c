@@ -6,6 +6,45 @@
 #include <string.h>
 #include <curl/curl.h>
 #include <json-c/json.h>
+#include "growablestring.h"
+
+void wordbook_get_suggestions()
+{
+    
+}
+
+// get suggestions from wordbook.cjpg.app, based on the query and the selected dictionary
+curl_download_result_t wordbook_get_suggestions_dict_json(const char *query, const char *dict_id)
+{
+    // dictionaryId
+    int len = strlen(API_BASE_URL API_PATH_SUGGESTIONS "?");
+    len += strlen(query);
+    growable_string_t gstr = growable_string_new(len);
+    growable_string_append_cstr(gstr, API_BASE_URL);
+    growable_string_append_cstr(gstr, API_PATH_SUGGESTIONS);
+    growable_string_append_cstr(gstr, "?query=");
+    growable_string_append_cstr(gstr, query);
+    growable_string_append_cstr(gstr, "&language=");
+    growable_string_append_cstr(gstr, dict_id);
+    curl_download_result_t result = wordbook_perform_http_get(gstr->s);
+    growable_string_delete(gstr);
+    return result;
+}
+
+// get suggestions from wordbook.cjpg.app, based on the query
+curl_download_result_t wordbook_get_suggestions_json(const char *query)
+{
+    int len = strlen(API_BASE_URL API_PATH_SUGGESTIONS "?");
+    len += strlen(query);
+    growable_string_t gstr = growable_string_new(len);
+    growable_string_append_cstr(gstr, API_BASE_URL);
+    growable_string_append_cstr(gstr, API_PATH_SUGGESTIONS);
+    growable_string_append_cstr(gstr, "?query=");
+    growable_string_append_cstr(gstr, query);
+    curl_download_result_t result = wordbook_perform_http_get(gstr->s);
+    growable_string_delete(gstr);
+    return result;
+}
 
 // get all available dictionaries
 wordbook_array_dictionary_t wordbook_get_dictionaries()

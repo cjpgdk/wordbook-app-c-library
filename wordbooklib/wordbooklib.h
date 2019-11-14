@@ -124,5 +124,9 @@ void wordbook_dictionary_free_props(struct wordbook_dictionary dict);
 // [Internal]: free memory used by wordbook_dictionary
 void wordbook_dictionary_free(wordbook_dictionary_t dict_struct_ptr);
 
+// get suggestions from wordbook.cjpg.app, based on the query
+curl_download_result_t wordbook_get_suggestions_json(const char *query);
+// get suggestions from wordbook.cjpg.app, based on the query and the selected dictionary
+curl_download_result_t wordbook_get_suggestions_dict_json(const char *query, const char *dict_id);
 
 #endif // !WORDBOOOKLIB_H
