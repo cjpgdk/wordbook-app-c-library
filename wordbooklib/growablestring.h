@@ -19,6 +19,9 @@ growable_string_t growable_string_new(int space);
 int growable_string_append_cstr(growable_string_t dest, const char *s);
 // growable string a simplifyed version of dyn-string 
 // https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c
+int growable_string_append_char(growable_string_t dest, char c);
+// growable string a simplifyed version of dyn-string 
+// https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c
 int growable_string_init(struct growable_string *gs_struct_ptr, int space);
 // growable string a simplifyed version of dyn-string 
 // https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c

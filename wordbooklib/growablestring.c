@@ -38,6 +38,24 @@ int growable_string_append_cstr(growable_string_t dest, const char* s)
 
 // growable string a simplifyed version of dyn-string 
 // https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c
+int growable_string_append_char(growable_string_t dest, char c)
+{
+    /* Make room for the extra character.  */
+    if (growable_string_resize(dest, dest->length + 1) == NULL)
+    {
+        return 0;
+    }
+    /* Append the character; it will overwrite the old NUL.  */
+    dest->s[dest->length] = c;
+    //  Add a \0 at the end.
+    dest->s[dest->length + 1] = '\0';
+    // increment
+    dest->length += 1;
+    return 1;
+}
+
+// growable string a simplifyed version of dyn-string 
+// https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c
 int growable_string_init(struct growable_string *gs_struct_ptr, int space)
 {
     /* We need at least one byte in which to store the terminating NUL.  */
