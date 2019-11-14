@@ -208,4 +208,33 @@ void insert_wordbook_suggestion(wordbook_array_suggestions_t suggest_array_struc
 
 
 
+/*
+ * definition methods!
+ *
+ * Methods marked as internal are only exposed becouse why not! But they are not ment to be used outside
+ * the library.
+ */
+
+
+
+
+// 
+/** get definitions of a word from wordbook.cjpg.app
+ *
+ * If using the word to lookup the definition both source_language_id and destination_language_id must be present in the request!
+ * 
+ * NOTE* that curl_download_result countains a pointer that needs
+ *       to freed when you are done with it
+ *
+ *
+ * @param word_id The word id
+ * @param word The word to lookup, if word_id is set it's ignored. Can be NULL
+ * @param source_language_id The id of the source language
+ * @param destination_language_id The id of the destination language
+ * @returns a curl_download_result with the raw json data.
+ * @see curl_download_result
+ */
+curl_download_result wordbook_get_dictionary_definitions_json(
+    const int word_id, const char *word, const int source_language_id, const int destination_language_id);
+
 #endif // !WORDBOOOKLIB_H

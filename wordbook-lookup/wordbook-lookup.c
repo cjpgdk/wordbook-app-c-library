@@ -61,6 +61,16 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }
 
+    // a fix, if print_suggests and print_dict
+    // but using lowercase l for dictionary id!
+    if (print_dicts && print_suggests)
+    {
+        if (print_dict == NULL)
+        {
+            print_dicts = false;
+        }
+    }
+
     // print dictionaries.
     // if print_suggests then we skip and use the dict_id in the suggestions lookup
     if (print_dicts && !print_suggests)
@@ -86,6 +96,17 @@ int main(int argc, char *argv[])
             if (print_dicts)
             {
                 // todo: show definition of the word
+                curl_download_result res = wordbook_get_dictionary_definitions_json(
+                    suggestion.word_id,
+                    NULL,
+                    suggestion.source_language_id,
+                    get_destination_language_id_from_dict_id(print_dict)
+                );
+                if (res.ptr != NULL)
+                {
+                    printf("\t*%s\n", res.ptr);
+                    free(res.ptr);
+                }
             }
             printf("--------------------------------------------------------\n\n");
         }

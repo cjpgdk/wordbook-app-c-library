@@ -73,6 +73,74 @@ int get_source_language_id_from_dict_id(const char *dict_id)
 
 
 /*****************************
+ * definition API methods!
+ *****************************/
+
+
+// get definitions of a word from wordbook.cjpg.app
+curl_download_result wordbook_get_dictionary_definitions_json(
+    const int word_id,  /* The word id */
+    const char *word, /* The word to lookup, if word_id is set it's ignored. Can be NULL */
+    const int source_language_id,  /* The id of the source language */
+    const int destination_language_id  /* The id of the destination language */)
+{
+    int len = strlen(API_BASE_URL API_PATH_DEFINITIONS "?");
+    growable_string_t gstr = growable_string_new(len);
+    growable_string_append_cstr(gstr, API_BASE_URL);
+    growable_string_append_cstr(gstr, API_PATH_DEFINITIONS);
+    if (word_id > 0)
+    {
+        growable_string_append_cstr(gstr, "?id=");
+        // word_id to string
+        len = snprintf(NULL, 0, "%i", word_id);
+        char* str_word_id = malloc(len + 1);
+        snprintf(str_word_id, len + 1, "%i", word_id);
+        // append
+        growable_string_append_cstr(gstr, str_word_id);
+        free(str_word_id);
+    }
+    else if (word != NULL)
+    {
+        growable_string_append_cstr(gstr, "?word=");
+        growable_string_append_cstr(gstr, word);
+    }
+    else
+    {
+        fprintf(stderr, "wordbook_get_dictionary_definitions_json() invalid call missing word_id or word!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (source_language_id > 0)
+    {
+        growable_string_append_cstr(gstr, "&src_language_id=");
+        // source_language_id to string
+        len = snprintf(NULL, 0, "%i", source_language_id);
+        char* str_source_language_id = malloc(len + 1);
+        snprintf(str_source_language_id, len + 1, "%i", source_language_id);
+        // append
+        growable_string_append_cstr(gstr, str_source_language_id);
+        free(str_source_language_id);
+    }
+    if (word_id > 0)
+    {
+        growable_string_append_cstr(gstr, "&dest_language_id=");
+        // destination_language_id to string
+        len = snprintf(NULL, 0, "%i", destination_language_id);
+        char* str_destination_language_id = malloc(len + 1);
+        snprintf(str_destination_language_id, len + 1, "%i", destination_language_id);
+        // append
+        growable_string_append_cstr(gstr, str_destination_language_id);
+        free(str_destination_language_id);
+    }
+
+    curl_download_result result = wordbook_perform_http_get(gstr->s);
+    growable_string_delete(gstr);
+
+    return result;
+}
+
+
+/*****************************
  * suggestion API methods!
  *****************************/
 
