@@ -101,6 +101,15 @@ typedef struct wordbook_array_dictionary
 } *wordbook_array_dictionary_t;
 
 
+/*****************************
+ * Helpers!
+ *****************************/
+
+// get source language id from dict_id
+int get_source_language_id_from_dict_id(const char *dict_id);
+// get destination language id from dict_id
+int get_destination_language_id_from_dict_id(const char *dict_id);
+
 /*
  * dictionary methods!
  *

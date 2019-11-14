@@ -1,3 +1,6 @@
+
+// todo: check return of growable_string_*
+
 #define _CRT_SECURE_NO_WARNINGS
 #include "growablestring.h"
 #include "wordbooklib.h"
@@ -8,6 +11,65 @@
 #include <json-c/json.h>
 
 
+/*****************************
+ * Helpers!
+ *****************************/
+
+// get destination language id from dict_id
+int get_destination_language_id_from_dict_id(const char *dict_id)
+{
+    int len = strlen(dict_id);
+    growable_string_t gstr = growable_string_new(len);
+    if (gstr == NULL)
+    {
+        return 0;
+    }
+    int start_append = 0;
+    for (size_t i = 0; i < len; i++)
+    {
+        if (start_append == 1)
+        {
+            int check = growable_string_append_char(gstr, dict_id[i]);
+            if (check == 0)
+            {
+                return 0;
+            }
+        }
+        if (start_append == 0 && dict_id[i] == '-')
+        {
+            start_append = 1;
+        }
+    }
+    int result = atoi(gstr->s);
+    growable_string_delete(gstr);
+    return result;
+}
+
+// get source language id from dict_id
+int get_source_language_id_from_dict_id(const char *dict_id)
+{
+    int len = strlen(dict_id);
+    growable_string_t gstr = growable_string_new(len);
+    if (gstr == NULL)
+    {
+        return 0;
+    }
+    for (size_t i = 0; i < len; i++)
+    {
+        if (dict_id[i] == '-')
+        {
+            break;
+        }
+        int check = growable_string_append_char(gstr, dict_id[i]);
+        if (check == 0)
+        {
+            return 0;
+        }
+    }
+    int result = atoi(gstr->s);
+    growable_string_delete(gstr);
+    return result;
+}
 
 
 /*****************************
