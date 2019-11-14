@@ -187,7 +187,7 @@ char *strstr_i(const char *s1, const char *s2)
     int len2 = strlen(p2);
     for (size_t i = 0; i < len1; i++)
     {
-        p1[i] = tolower(p2[i]);
+        p1[i] = tolower(p1[i]);
     }
 
     for (size_t i = 0; i < len2; i++)
