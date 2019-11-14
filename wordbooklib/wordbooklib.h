@@ -10,6 +10,46 @@
 #define API_PATH_DEFINITIONS "/definitions"
 
 /**
+ * struct for downloaded suggestions!
+ */
+typedef struct wordbook_suggestion
+{
+    /**
+     * Word id eg. 2139
+     */
+    int word_id;
+    /**
+     * The suggested word eg. 'hello'
+     */
+    char *word;
+    /**
+     * Language id eg. 1
+     */
+    int source_language_id;
+    /**
+     * Ful name of the soiurce language eg. English
+     */
+    char *source_language_name;
+} *wordbook_suggestion_t;
+
+/**
+ * struct 'ARRAY' of the suggestions!
+ */
+typedef struct wordbook_array_suggestions
+{
+    // array of suggestions 
+    wordbook_suggestion_t suggestions;
+    /**
+     * current size of the '*suggestions'
+     * should be the same as count, but used for allocating memory
+     * We cannot count on this being the actual count of wordbook_dictionary objects.
+     */
+    size_t size;
+    // the current count of '*suggestions', use this in loops! 
+    size_t count;
+} *wordbook_array_suggestions_t;
+
+/**
  * struct for downloaded dictionaries!
  */
 typedef struct wordbook_dictionary
@@ -95,7 +135,7 @@ void wordbook_dictionary_free_props(struct wordbook_dictionary dict);
 void wordbook_dictionary_free(wordbook_dictionary_t dict_struct_ptr);
 
 
-void wordbook_get_suggestions(const char *query, const char *dict_id);
+wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const char *dict_id);
 
 /** get suggestions from wordbook.cjpg.app, based on the query
  *
@@ -116,5 +156,17 @@ curl_download_result wordbook_get_suggestions_json(const char *query);
  * @see curl_download_result
  */
 curl_download_result wordbook_get_dictionary_suggestions_json(const char *query, const char *dict_id);
+
+// initialize the array struct for 'wordbook_suggestion' with a given size!
+void initialize_array_wordbook_suggestions(wordbook_array_suggestions_t suggest_array_struct_ptr, size_t initial_size);
+
+// free memory used by props in 'wordbook_suggestion'
+// make sure all props are NULL or a valid pointer.
+void wordbook_suggestion_free_props(struct wordbook_suggestion suggest);
+
+// Insert a 'wordbook_suggestion' into an wordbook_array_suggestions
+void insert_wordbook_suggestion(wordbook_array_suggestions_t suggest_array_struct_ptr, struct wordbook_suggestion suggest);
+// free memory used by the 'wordbook_array_suggestions'
+void wordbook_array_suggestion_free(wordbook_array_suggestions_t suggest_array);
 
 #endif // !WORDBOOOKLIB_H

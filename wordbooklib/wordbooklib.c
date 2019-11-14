@@ -8,20 +8,149 @@
 #include <string.h>
 #include <json-c/json.h>
 
-void wordbook_get_suggestions(const char *query, const char *dict_id)
+wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const char *dict_id)
 {
     curl_download_result json_result;
     if (dict_id == NULL)
     {
         json_result = wordbook_get_suggestions_json(query);
-    } 
+    }
     else
     {
         json_result = wordbook_get_dictionary_suggestions_json(query, dict_id);
     }
+    // declare the array to hold the suggestions
+    wordbook_array_suggestions_t suggest_array = (wordbook_array_suggestions_t)malloc(sizeof(struct wordbook_array_suggestions));
 
-    printf("%s\n", json_result.ptr);
-    free(json_result.ptr);
+    // make sure we got a pointer
+    if (json_result.ptr != NULL)
+    {
+        // parse the json string
+        struct json_object *json_obj;
+        json_obj = json_tokener_parse(json_result.ptr);
+        // get the type of data, making sure it's an object
+        if (json_object_is_type(json_obj, json_type_object))
+        {
+            // extract the 'suggestions' property of the json object.
+            struct json_object *suggestions_obj;
+            json_bool suggestions_located = json_object_object_get_ex(json_obj, "suggestions", &suggestions_obj);
+            if (suggestions_located == 0)
+            {
+                // unable to locate suggestions array....
+                json_object_put(json_obj);
+                free(json_result.ptr);
+                free(suggest_array);
+                return NULL;
+            }
+
+            int suggestions_count = json_object_array_length(suggestions_obj);
+
+            // initialize the suggestions array
+            initialize_array_wordbook_suggestions(suggest_array, suggestions_count);
+
+            for (int i = 0; i < suggestions_count; i++)
+            {
+                 // get the array item at index 'i'
+                json_object *obj = json_object_array_get_idx(suggestions_obj, i);
+
+                // create a temporary dict.
+                struct wordbook_suggestion suggest = (struct wordbook_suggestion){ NULL,  NULL, NULL, NULL };
+
+                // lets just confirm this is an object
+                if (json_object_is_type(obj, json_type_object))
+                {
+                    // all data related to a word is located in property "data"
+                    struct json_object *word_data;
+                    json_bool word_data_located = json_object_object_get_ex(obj, "data", &word_data);
+                    if (word_data_located == 0)
+                    {
+                        // unable to locate data....
+                        continue;
+                    }
+
+                    struct json_object_iterator it;
+                    struct json_object_iterator it_end;
+
+                    it = json_object_iter_begin(word_data);
+                    it_end = json_object_iter_end(word_data);
+
+                    // loop the properties in the object
+                    while (!json_object_iter_equal(&it, &it_end))
+                    {
+                        // check the data and only get that type!
+                        struct json_object *obj_val = json_object_iter_peek_value(&it);
+                        if (json_object_is_type(obj_val, json_type_string))
+                        {
+                            char *name = json_object_iter_peek_name(&it);
+                            char *value = json_object_get_string(obj_val);
+
+                            // Copy language name
+                            if (_strcmpi(name, "language") == 0)
+                            {
+                                suggest.source_language_name = malloc(strlen(value) + 1);
+                                if (suggest.source_language_name == NULL)
+                                {
+                                    continue;
+                                }
+                                strcpy(suggest.source_language_name, value);
+                            }
+                            // Copy the word
+                            else if (_strcmpi(name, "word") == 0)
+                            {
+                                suggest.word = malloc(strlen(value) + 1);
+                                if (suggest.word == NULL)
+                                {
+                                    continue;
+                                }
+                                strcpy(suggest.word, value);
+                            }
+                            /*
+                             * These are int's but, we can't trust that I will keep it that way!
+                             */
+                            // Copy the language_id
+                            else if (_strcmpi(name, "language_id") == 0)
+                            {
+                                suggest.source_language_id = atoi(value);
+                            }
+                            // Copy the word_id
+                            else if (_strcmpi(name, "word_id") == 0)
+                            {
+                                suggest.word_id = atoi(value);
+                            }
+                        }
+                        else if (json_object_is_type(obj_val, json_type_int))
+                        {
+                            char *name = json_object_iter_peek_name(&it);
+                            int32_t value = json_object_get_int(obj_val);
+
+                            // Copy the language_id
+                            if (_strcmpi(name, "language_id") == 0)
+                            {
+                                suggest.source_language_id = value;
+                            }
+                            // Copy the word_id
+                            else if (_strcmpi(name, "word_id") == 0)
+                            {
+                                suggest.word_id = value;
+                            }
+                        }
+                        // move to next object
+                        json_object_iter_next(&it);
+                    }
+                }
+
+                // insert the new dict into the array.
+                insert_wordbook_suggestion(suggest_array, suggest);
+                // free memory used by temp dict
+                wordbook_suggestion_free_props(suggest);
+            }
+        }
+        // free the json object
+        json_object_put(json_obj);
+        // free the downloaded json.
+        free(json_result.ptr);
+    }
+    return suggest_array;
 }
 
 // get suggestions from wordbook.cjpg.app, based on the query and the selected dictionary
@@ -34,8 +163,11 @@ curl_download_result wordbook_get_dictionary_suggestions_json(const char *query,
     growable_string_append_cstr(gstr, API_PATH_SUGGESTIONS);
     growable_string_append_cstr(gstr, "?query=");
     growable_string_append_cstr(gstr, query);
-    growable_string_append_cstr(gstr, "&language=");
-    growable_string_append_cstr(gstr, dict_id);
+    if (dict_id != NULL)
+    {
+        growable_string_append_cstr(gstr, "&language=");
+        growable_string_append_cstr(gstr, dict_id);
+    }
     curl_download_result result = wordbook_perform_http_get(gstr->s);
     growable_string_delete(gstr);
     return result;
@@ -44,19 +176,118 @@ curl_download_result wordbook_get_dictionary_suggestions_json(const char *query,
 // get suggestions from wordbook.cjpg.app, based on the query
 curl_download_result wordbook_get_suggestions_json(const char *query)
 {
-    int len = strlen(API_BASE_URL API_PATH_SUGGESTIONS "?");
-    len += strlen(query);
-    growable_string_t gstr = growable_string_new(len);
-    growable_string_append_cstr(gstr, API_BASE_URL);
-    growable_string_append_cstr(gstr, API_PATH_SUGGESTIONS);
-    growable_string_append_cstr(gstr, "?query=");
-    growable_string_append_cstr(gstr, query);
-    curl_download_result result = wordbook_perform_http_get(gstr->s);
-    growable_string_delete(gstr);
-    return result;
+    return wordbook_get_dictionary_suggestions_json(query, NULL);
 }
 
-// get all available dictionaries
+
+/*****************************
+ * suggestions array methods!
+ *****************************/
+
+ // Insert a 'wordbook_suggestion' into an wordbook_array_suggestions
+void insert_wordbook_suggestion(wordbook_array_suggestions_t suggest_array_struct_ptr, struct wordbook_suggestion suggest)
+{
+    // increment the size, if needed.
+    if (suggest_array_struct_ptr->count == suggest_array_struct_ptr->size)
+    {
+
+        suggest_array_struct_ptr->size *= 2;
+
+        suggest_array_struct_ptr->suggestions = (wordbook_suggestion_t)realloc(
+            suggest_array_struct_ptr->suggestions,
+            suggest_array_struct_ptr->size * sizeof(struct wordbook_suggestion)
+        );
+
+        if (suggest_array_struct_ptr->suggestions == NULL)
+        {
+            fprintf(stderr, "realloc() failed in insert_wordbook_suggestion\n");
+            exit(EXIT_FAILURE);
+        }
+        // Initialize the last/new elements of the reallocated array
+        for (unsigned int i = suggest_array_struct_ptr->count; i < suggest_array_struct_ptr->size; i++)
+        {
+            memset(&suggest_array_struct_ptr->suggestions[i], 0, sizeof(struct wordbook_suggestion));
+        }
+    }
+
+    // simplify the code, by collecting the index.
+    size_t index = suggest_array_struct_ptr->count;
+
+    // Copy the source_language_name.
+    size_t len = strlen(suggest.source_language_name) + 1;
+    suggest_array_struct_ptr->suggestions[index].source_language_name = malloc(len);
+    if (suggest_array_struct_ptr->suggestions[index].source_language_name != NULL)
+    {
+        strcpy(suggest_array_struct_ptr->suggestions[index].source_language_name, suggest.source_language_name);
+    }
+
+    // Copy the word.
+    len = strlen(suggest.word) + 1;
+    suggest_array_struct_ptr->suggestions[index].word = malloc(len);
+    if (suggest_array_struct_ptr->suggestions[index].word != NULL)
+    {
+        strcpy(suggest_array_struct_ptr->suggestions[index].word, suggest.word);
+    }
+
+    // Copy the word and lanuage id.
+    suggest_array_struct_ptr->suggestions[index].word_id = suggest.word_id;
+    suggest_array_struct_ptr->suggestions[index].source_language_id = suggest.source_language_id;
+
+    suggest_array_struct_ptr->count++;
+}
+
+ // initialize the array struct for 'wordbook_suggestion' with a given size!
+void initialize_array_wordbook_suggestions(wordbook_array_suggestions_t suggest_array_struct_ptr, size_t initial_size)
+{
+    // Allocate initial space
+    suggest_array_struct_ptr->suggestions = (wordbook_suggestion_t)malloc(initial_size * sizeof(struct wordbook_suggestion));
+    suggest_array_struct_ptr->count = 0;
+    suggest_array_struct_ptr->size = initial_size;
+
+    // Initialize all values of the array to 0
+    for (int i = 0; i < initial_size; i++)
+    {
+        memset(&suggest_array_struct_ptr->suggestions[i], 0, sizeof(struct wordbook_suggestion));
+    }
+}
+
+
+// free memory used by props in 'wordbook_suggestion'
+// make sure all props are NULL or a valid pointer.
+void wordbook_suggestion_free_props(struct wordbook_suggestion suggest)
+{
+    if (suggest.source_language_name)
+    {
+        free(suggest.source_language_name);
+    }
+    if (suggest.word)
+    {
+        free(suggest.word);
+    }
+}
+
+// free memory used by the 'wordbook_array_suggestions'
+void wordbook_array_suggestion_free(wordbook_array_suggestions_t suggest_array)
+{
+    if (suggest_array != NULL)
+    {
+        if (suggest_array->suggestions != NULL)
+        {
+            for (int i = 0; i < suggest_array->count; i++)
+            {
+                wordbook_suggestion_free_props(suggest_array->suggestions[i]);
+            }
+            free(suggest_array->suggestions);
+        }
+        free(suggest_array);
+    }
+}
+
+/*****************************
+ * dictionary API methods!
+ *****************************/
+
+ // get all available dictionaries
 wordbook_array_dictionary_t wordbook_get_dictionaries()
 {
     // get the raw json data
@@ -91,7 +322,7 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
                  // get the array item at index 'i'
                 json_object *obj = json_object_array_get_idx(json_obj, i);
 
-                // create a temperary dict.
+                // create a temporary dict.
                 struct wordbook_dictionary dict = (struct wordbook_dictionary){ NULL,  NULL, NULL, NULL, NULL, NULL };
 
                 // lets just confirm this is an object
@@ -192,15 +423,30 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
     return dict_array;
 }
 
-// Insert a 'wordbook_dictionary' into an wordbook_array_dictionary
+ // download all available dictionaries from wordbook.cjpg.app. 
+curl_download_result wordbook_get_dictionaries_json()
+{
+    return wordbook_perform_http_get(API_BASE_URL API_PATH_DICTIONARIES);
+}
+
+/*****************************
+ * dictionary array methods!
+ *****************************/
+
+ // Insert a 'wordbook_dictionary' into an wordbook_array_dictionary
 void insert_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_ptr, struct wordbook_dictionary dict)
 {
     // increment the size, if needed.
     if (dict_array_struct_ptr->count == dict_array_struct_ptr->size)
     {
+
         dict_array_struct_ptr->size *= 2;
-        dict_array_struct_ptr->dicts = 
-            (wordbook_dictionary_t)realloc(dict_array_struct_ptr->dicts, dict_array_struct_ptr->size * sizeof(struct wordbook_dictionary));
+
+        dict_array_struct_ptr->dicts = (wordbook_dictionary_t)realloc(
+            dict_array_struct_ptr->dicts,
+            dict_array_struct_ptr->size * sizeof(struct wordbook_dictionary)
+        );
+
         if (dict_array_struct_ptr->dicts == NULL)
         {
             fprintf(stderr, "realloc() failed in insert_wordbook_dictionary\n");
@@ -267,6 +513,7 @@ void insert_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_pt
     dict_array_struct_ptr->count++;
 }
 
+
 // initialize the array struct for 'wordbook_dictionary' eith a given size!
 void initialize_array_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_ptr, size_t initial_size)
 {
@@ -329,6 +576,7 @@ void wordbook_dictionary_free_props(struct wordbook_dictionary dict)
     }
 }
 
+
 // free memory used by 'wordbook_dictionary'
 void wordbook_dictionary_free(wordbook_dictionary_t dict_struct_ptr)
 {
@@ -337,10 +585,4 @@ void wordbook_dictionary_free(wordbook_dictionary_t dict_struct_ptr)
     {
         free(dict_struct_ptr);
     }
-}
-
-// download all available dictionaries from wordbook.cjpg.app. 
-curl_download_result wordbook_get_dictionaries_json()
-{
-    return wordbook_perform_http_get(API_BASE_URL API_PATH_DICTIONARIES);
 }

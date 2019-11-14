@@ -71,7 +71,25 @@ int main(int argc, char *argv[])
 
     if (print_suggests)
     {
-        wordbook_get_suggestions(print_suggest, print_dict);
+        wordbook_array_suggestions_t suggestion_array = wordbook_get_suggestions(print_suggest, print_dict);
+
+        for (size_t i = 0; i < suggestion_array->count; i++)
+        {
+            struct wordbook_suggestion suggestion = suggestion_array->suggestions[i];
+
+            printf("Word id .........: %i\n", suggestion.word_id);
+            printf("word ............: %s\n", suggestion.word);
+            printf("Src language name: %s\n", suggestion.source_language_name);
+            printf("Src language id .: %i\n", suggestion.source_language_id);
+            if (print_dicts)
+            {
+                // todo: show difinition of the word
+            }
+            printf("--------------------------------------------------------\n\n");
+        }
+
+        // free all memory used by the downloaded dictionaries
+        wordbook_array_suggestion_free(suggestion_array);
         return EXIT_SUCCESS;
     }
 
@@ -103,7 +121,7 @@ void print_help_text(const char *app)
 void print_all_dictionaries(const char *search)
 {
     // download all dictionaries 
-   struct wordbook_array_dictionary *dict_array;
+    struct wordbook_array_dictionary *dict_array;
     dict_array = wordbook_get_dictionaries();
 
     // loop over all dictionaries, and print their info!
@@ -154,7 +172,7 @@ void print_all_dictionaries(const char *search)
         }
     }
 
-    // free all memory usen by the downloaded dictionaries
+    // free all memory used by the downloaded dictionaries
     wordbook_array_dictionary_free(dict_array);
 }
 
