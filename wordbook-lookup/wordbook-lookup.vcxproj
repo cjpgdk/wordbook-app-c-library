@@ -168,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="getopt.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="wordbook-lookup.h" />
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +178,12 @@
     <ClCompile Update="D:\Projects\wordbook.cjpg.app\libraries\c\wordbooklib\growablestring.c">
       <FileType>CppCode</FileType>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="wordbook-lookup.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="language.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
