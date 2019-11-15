@@ -1,4 +1,5 @@
 #include "growablestring.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 // growable string a simplifyed version of dyn-string 
@@ -52,6 +53,22 @@ int growable_string_append_char(growable_string_t dest, char c)
     // increment
     dest->length += 1;
     return 1;
+}
+
+int growable_string_append_int(growable_string_t dest, int i)
+{
+    /* convert integer to string.  */
+    int len = snprintf(NULL, 0, "%i", i);
+    char* stri = malloc(len + 1);
+    snprintf(stri, len + 1, "%i", i);
+    // append
+    if (stri)
+    {
+        int result = growable_string_append_cstr(dest, stri);
+        free(stri);
+        return result;
+    }
+    return 0;
 }
 
 // growable string a simplifyed version of dyn-string 

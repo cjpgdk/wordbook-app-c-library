@@ -27,4 +27,5 @@ int growable_string_init(struct growable_string *gs_struct_ptr, int space);
 // https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c
 growable_string_t growable_string_resize(growable_string_t gs, int space);
 void growable_string_delete(growable_string_t gs);
+int growable_string_append_int(growable_string_t dest, int i);
 #endif // !GROWABLESTRING_H
