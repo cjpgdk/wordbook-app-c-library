@@ -35,7 +35,7 @@ int get_destination_language_id_from_dict_id(const char *dict_id)
                 return 0;
             }
         }
-        if (start_append == 0 && dict_id[i] == '-')
+        else if (start_append == 0 && dict_id[i] == '-')
         {
             start_append = 1;
         }
@@ -91,13 +91,7 @@ curl_download_result wordbook_get_dictionary_definitions_json(
     if (word_id > 0)
     {
         growable_string_append_cstr(gstr, "?id=");
-        // word_id to string
-        len = snprintf(NULL, 0, "%i", word_id);
-        char* str_word_id = malloc(len + 1);
-        snprintf(str_word_id, len + 1, "%i", word_id);
-        // append
-        growable_string_append_cstr(gstr, str_word_id);
-        free(str_word_id);
+        growable_string_append_int(gstr, word_id);
     }
     else if (word != NULL)
     {
@@ -113,24 +107,12 @@ curl_download_result wordbook_get_dictionary_definitions_json(
     if (source_language_id > 0)
     {
         growable_string_append_cstr(gstr, "&src_language_id=");
-        // source_language_id to string
-        len = snprintf(NULL, 0, "%i", source_language_id);
-        char* str_source_language_id = malloc(len + 1);
-        snprintf(str_source_language_id, len + 1, "%i", source_language_id);
-        // append
-        growable_string_append_cstr(gstr, str_source_language_id);
-        free(str_source_language_id);
+        growable_string_append_int(gstr, source_language_id);
     }
     if (destination_language_id > 0)
     {
         growable_string_append_cstr(gstr, "&dest_language_id=");
-        // destination_language_id to string
-        len = snprintf(NULL, 0, "%i", destination_language_id);
-        char* str_destination_language_id = malloc(len + 1);
-        snprintf(str_destination_language_id, len + 1, "%i", destination_language_id);
-        // append
-        growable_string_append_cstr(gstr, str_destination_language_id);
-        free(str_destination_language_id);
+        growable_string_append_int(gstr, destination_language_id);
     }
 
     curl_download_result result = wordbook_perform_http_get(gstr->s);

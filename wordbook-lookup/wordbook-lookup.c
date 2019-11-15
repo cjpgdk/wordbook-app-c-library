@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
                 curl_download_result res = wordbook_get_dictionary_definitions_json(
                     suggestion.word_id,
                     NULL,
-                    suggestion.source_language_id,
+                    get_source_language_id_from_dict_id(print_dict),
                     get_destination_language_id_from_dict_id(print_dict)
                 );
                 if (res.ptr != NULL)
