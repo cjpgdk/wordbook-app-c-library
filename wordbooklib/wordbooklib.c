@@ -121,7 +121,7 @@ curl_download_result wordbook_get_dictionary_definitions_json(
         growable_string_append_cstr(gstr, str_source_language_id);
         free(str_source_language_id);
     }
-    if (word_id > 0)
+    if (destination_language_id > 0)
     {
         growable_string_append_cstr(gstr, "&dest_language_id=");
         // destination_language_id to string
