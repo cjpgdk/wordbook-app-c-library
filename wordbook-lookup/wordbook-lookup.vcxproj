@@ -178,9 +178,6 @@
     <ClCompile Update="D:\Projects\wordbook.cjpg.app\libraries\c\wordbooklib\growablestring.c">
       <FileType>CppCode</FileType>
     </ClCompile>
-    <ClCompile Update="D:\Projects\wordbook.cjpg.app\libraries\c\wordbooklib\wordbookarray.c">
-      <FileType>CppCode</FileType>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="wordbook-lookup.rc" />
