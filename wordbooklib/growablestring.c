@@ -1,6 +1,8 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "growablestring.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // growable string a simplifyed version of dyn-string 
 // https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c
