@@ -59,11 +59,11 @@ int growable_string_append_int(growable_string_t dest, int i)
 {
     /* convert integer to string.  */
     int len = snprintf(NULL, 0, "%i", i);
-    char* stri = malloc(len + 1);
-    snprintf(stri, len + 1, "%i", i);
+    char *stri = malloc(len + 1);
     // append
     if (stri)
     {
+        snprintf(stri, len + 1, "%i", i);
         int result = growable_string_append_cstr(dest, stri);
         free(stri);
         return result;

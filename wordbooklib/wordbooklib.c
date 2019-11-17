@@ -76,6 +76,122 @@ int get_source_language_id_from_dict_id(const char *dict_id)
  * definition API methods!
  *****************************/
 
+wordbook_array_definition_t wordbook_get_definitions(
+    const int word_id,  /* The word id */
+    const char *word, /* The word to lookup, if word_id is set it's ignored. Can be NULL */
+    const int source_language_id,  /* The id of the source language */
+    const int destination_language_id  /* The id of the destination language */)
+{
+    curl_download_result json_result;
+    json_result = wordbook_get_dictionary_definitions_json(word_id, word, source_language_id, destination_language_id);
+
+    // declare the array to hold the definitions
+    wordbook_array_definition_t final_definitions_array = (wordbook_array_definition_t)malloc(sizeof(struct wordbook_array_definition));
+
+    if (json_result.ptr != NULL)
+    {
+        // parse the json string
+        struct json_object* json_obj;
+        json_obj = json_tokener_parse(json_result.ptr);
+
+        if (json_object_is_type(json_obj, json_type_object))
+        {
+            // initialize the definitions array, we cannot get the size so we assume size of 1
+            initialize_array_wordbook_definitions(final_definitions_array, 1);
+
+            struct json_object_iterator dictionaries_it;
+            struct json_object_iterator dictionaries_it_end;
+
+            dictionaries_it = json_object_iter_begin(json_obj);
+            dictionaries_it_end = json_object_iter_end(json_obj);
+
+            // loop the properties in the object, 
+            while (!json_object_iter_equal(&dictionaries_it, &dictionaries_it_end))
+            {
+                // check the data and only get that type!
+                struct json_object* definitions_array = json_object_iter_peek_value(&dictionaries_it);
+                // each name is the id of a dictionary!
+                const char* name = json_object_iter_peek_name(&dictionaries_it);
+                if (json_object_is_type(definitions_array, json_type_array))
+                {
+                    // the actual definition array, for a word, in the dictionary
+                    int definition_length = json_object_array_length(definitions_array);
+                    for (size_t i = 0; i < definition_length; i++)
+                    {
+                        // get the definition at index 'i'
+                        json_object* definition = json_object_array_get_idx(definitions_array, i);
+
+                        struct wordbook_definition struct_definition = (struct wordbook_definition){NULL, NULL, 0, 0, 0};
+
+                        // the properties in this definition!
+                        struct json_object_iterator definition_it;
+                        struct json_object_iterator definition_it_end;
+                        definition_it = json_object_iter_begin(definition);
+                        definition_it_end = json_object_iter_end(definition);
+                        while (!json_object_iter_equal(&definition_it, &definition_it_end))
+                        {
+                            // check that it's a string or an int, we do not care about any other data!
+                            struct json_object* definition_value = json_object_iter_peek_value(&definition_it);
+                            if (!json_object_is_type(definition_value, json_type_string) && !json_object_is_type(definition_value, json_type_int))
+                            {
+                                continue;
+                            }
+
+                            const char *definition_name = json_object_iter_peek_name(&definition_it);
+
+                            if (_strcmpi(definition_name, "definition") == 0)
+                            {
+                                const char *value = json_object_get_string(definition_value);
+                                struct_definition.definition = malloc(strlen(value) + 1);
+                                if (struct_definition.definition == NULL)
+                                {
+                                    continue;
+                                }
+                                strcpy(struct_definition.definition, value);
+                            }
+                            else if (_strcmpi(definition_name, "dictionary") == 0)
+                            {
+                                const char *value = json_object_get_string(definition_value);
+                                struct_definition.dictionary = malloc(strlen(value) + 1);
+                                if (struct_definition.dictionary == NULL)
+                                {
+                                    continue;
+                                }
+                                strcpy(struct_definition.dictionary, value);
+                            }
+                            else if (_strcmpi(definition_name, "word_id") == 0)
+                            {
+                                struct_definition.word_id = json_object_get_int(definition_value);
+                            }
+                            else if (_strcmpi(definition_name, "dest_language_id") == 0)
+                            {
+                                struct_definition.destination_language_id = json_object_get_int(definition_value);
+                            }
+                            else if (_strcmpi(definition_name, "src_language_id") == 0)
+                            {
+                                struct_definition.source_language_id = json_object_get_int(definition_value);
+                            }
+
+                            // move to next object
+                            json_object_iter_next(&definition_it);
+                        }
+                        // append and free.
+                        insert_wordbook_definition(final_definitions_array, struct_definition);
+                        wordbook_definition_free_props(struct_definition);
+                    }
+
+                }
+                // move to next object
+                json_object_iter_next(&dictionaries_it);
+            }
+        }
+        json_object_put(json_obj);
+        free(json_result.ptr);
+    }
+
+    return final_definitions_array;
+}
+
 
 // get definitions of a word from wordbook.cjpg.app
 curl_download_result wordbook_get_dictionary_definitions_json(
@@ -123,9 +239,101 @@ curl_download_result wordbook_get_dictionary_definitions_json(
 
 
 /*****************************
+ * definitions array methods!
+ *****************************/
+
+ // free memory used by props in 'wordbook_definition'
+ // make sure all props are NULL or a valid pointer.
+void wordbook_definition_free_props(struct wordbook_definition definition)
+{
+    if (definition.definition)
+    {
+        free(definition.definition);
+    }
+    if (definition.dictionary)
+    {
+        free(definition.dictionary);
+    }
+}
+
+ // Insert a 'wordbook_definition' into an wordbook_array_definition
+void insert_wordbook_definition(wordbook_array_definition_t definition_array_struct_ptr, struct wordbook_definition definition)
+{
+    // increment the size, if needed.
+    if (definition_array_struct_ptr->count == definition_array_struct_ptr->size)
+    {
+        definition_array_struct_ptr->size *= 2;
+        wordbook_suggestion_t tmp = (wordbook_suggestion_t)realloc(
+            definition_array_struct_ptr->definitions,
+            definition_array_struct_ptr->size * sizeof(struct wordbook_suggestion)
+        );
+
+        if (tmp == NULL)
+        {
+            fprintf(stderr, "realloc() failed in insert_wordbook_suggestion\n");
+            exit(EXIT_FAILURE);
+        }
+
+        definition_array_struct_ptr->definitions = tmp;
+        // Initialize the last/new elements of the reallocated array
+        for (size_t i = definition_array_struct_ptr->count; i < definition_array_struct_ptr->size; i++)
+        {
+            memset(&definition_array_struct_ptr->definitions[i], 0, sizeof(struct wordbook_suggestion));
+        }
+    }
+
+    // simplify the code, by collecting the index.
+    size_t index = definition_array_struct_ptr->count;
+
+    // Copy the definition.
+    size_t len = strlen(definition.definition) + 1;
+    definition_array_struct_ptr->definitions[index].definition = malloc(len);
+    if (definition_array_struct_ptr->definitions[index].definition != NULL)
+    {
+        strcpy(definition_array_struct_ptr->definitions[index].definition, definition.definition);
+    }
+
+    // Copy the dictionary.
+    len = strlen(definition.dictionary) + 1;
+    definition_array_struct_ptr->definitions[index].dictionary = malloc(len);
+    if (definition_array_struct_ptr->definitions[index].dictionary != NULL)
+    {
+        strcpy(definition_array_struct_ptr->definitions[index].dictionary, definition.dictionary);
+    }
+
+    // Copy the word and lanuage id.
+    definition_array_struct_ptr->definitions[index].word_id = definition.word_id;
+    definition_array_struct_ptr->definitions[index].source_language_id = definition.source_language_id;
+    definition_array_struct_ptr->definitions[index].destination_language_id = definition.destination_language_id;
+
+    definition_array_struct_ptr->count++;
+}
+
+
+ // initialize the array struct for 'wordbook_definition' with a given size!
+void initialize_array_wordbook_definitions(wordbook_array_definition_t definition_array_struct_ptr, size_t initial_size)
+{
+    // Allocate initial space
+    definition_array_struct_ptr->definitions = (wordbook_suggestion_t)malloc(initial_size * sizeof(struct wordbook_definition));
+    definition_array_struct_ptr->count = 0;
+    definition_array_struct_ptr->size = initial_size;
+
+    // Initialize all values of the array to 0
+    for (size_t i = 0; i < initial_size; i++)
+    {
+        // C6011
+        if (definition_array_struct_ptr->definitions)
+        {
+            memset(&definition_array_struct_ptr->definitions[i], 0, sizeof(struct wordbook_definition));
+        }
+    }
+}
+
+/*****************************
  * suggestion API methods!
  *****************************/
 
+// get suggestions for a word or phrase.
 wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const char *dict_id)
 {
     curl_download_result json_result;
@@ -324,7 +532,7 @@ void insert_wordbook_suggestion(wordbook_array_suggestions_t suggest_array_struc
 
         suggest_array_struct_ptr->suggestions = tmp;
         // Initialize the last/new elements of the reallocated array
-        for (unsigned int i = suggest_array_struct_ptr->count; i < suggest_array_struct_ptr->size; i++)
+        for (size_t i = suggest_array_struct_ptr->count; i < suggest_array_struct_ptr->size; i++)
         {
             memset(&suggest_array_struct_ptr->suggestions[i], 0, sizeof(struct wordbook_suggestion));
         }
@@ -579,7 +787,7 @@ void insert_wordbook_dictionary(wordbook_array_dictionary_t dict_array_struct_pt
 
         dict_array_struct_ptr->dicts = tmp;
         // Initialize the last/new elements of the reallocated array
-        for (unsigned int i = dict_array_struct_ptr->count; i < dict_array_struct_ptr->size; i++)
+        for (size_t i = dict_array_struct_ptr->count; i < dict_array_struct_ptr->size; i++)
         {
             memset(&dict_array_struct_ptr->dicts[i], 0, sizeof(struct wordbook_dictionary));
         }

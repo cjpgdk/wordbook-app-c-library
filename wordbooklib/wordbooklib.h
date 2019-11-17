@@ -9,6 +9,52 @@
 #define API_PATH_SUGGESTIONS "/suggestions"
 #define API_PATH_DEFINITIONS "/definitions"
 
+
+/**
+ * struct for downloaded suggestions!
+ */
+typedef struct wordbook_definition
+{
+    /**
+     * The definition of the word!
+     */
+    char *definition;
+    /**
+     * The full dictionary name
+     */
+    char *dictionary;
+    /**
+     * Word id eg. 2139
+     */
+    int word_id;
+    /**
+     * Source Language id eg. 1
+     */
+    int source_language_id;
+    /**
+     * Destination Language id eg. 2
+     */
+    int destination_language_id;
+} *wordbook_definition_t;
+
+/**
+ * struct 'ARRAY' of the definitions!
+ */
+typedef struct wordbook_array_definition
+{
+    // array of definitions 
+    wordbook_definition_t definitions;
+    /**
+     * current size of the '*definitions'
+     * should be the same as count, but used for allocating memory
+     * We cannot count on this being the actual count of wordbook_definition objects.
+     */
+    size_t size;
+    // the current count of '*definitions', use this in loops! 
+    size_t count;
+} *wordbook_array_definition_t;
+
+
 /**
  * struct for downloaded suggestions!
  */
@@ -42,7 +88,7 @@ typedef struct wordbook_array_suggestions
     /**
      * current size of the '*suggestions'
      * should be the same as count, but used for allocating memory
-     * We cannot count on this being the actual count of wordbook_dictionary objects.
+     * We cannot count on this being the actual count of wordbook_suggestion objects.
      */
     size_t size;
     // the current count of '*suggestions', use this in loops! 
@@ -236,5 +282,16 @@ void insert_wordbook_suggestion(wordbook_array_suggestions_t suggest_array_struc
  */
 curl_download_result wordbook_get_dictionary_definitions_json(
     const int word_id, const char *word, const int source_language_id, const int destination_language_id);
+
+wordbook_array_definition_t wordbook_get_definitions(
+    const int word_id, const char *word, const int source_language_id, const int destination_language_id);
+
+// [Internal]: initialize the array struct for 'wordbook_definition' with a given size!
+void initialize_array_wordbook_definitions(wordbook_array_definition_t definition_array_struct_ptr, size_t initial_size);
+// [Internal]: Insert a 'wordbook_definition' into an wordbook_array_definition
+void insert_wordbook_definition(wordbook_array_definition_t definition_array_struct_ptr, struct wordbook_definition definition);
+// free memory used by props in 'wordbook_definition'
+// make sure all props are NULL or a valid pointer.
+void wordbook_definition_free_props(struct wordbook_definition definition);
 
 #endif // !WORDBOOOKLIB_H

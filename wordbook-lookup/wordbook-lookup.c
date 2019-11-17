@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include"wordbooklib.h"
-#include <json-c/json.h>
+#include "wordbooklib.h"
+#include "growablestring.h"
 #include "wordbook-lookup.h"
 #ifdef _MSC_VER
 #include "getopt.h"
@@ -95,17 +95,34 @@ int main(int argc, char *argv[])
             printf("Src language id .: %i\n", suggestion.source_language_id);
             if (print_dicts)
             {
-                // todo: show definition of the word
-                curl_download_result res = wordbook_get_dictionary_definitions_json(
+                wordbook_array_definition_t res = wordbook_get_definitions(
                     suggestion.word_id,
-                    NULL,
-                    get_source_language_id_from_dict_id(print_dict),
+                    NULL, suggestion.source_language_id,
                     get_destination_language_id_from_dict_id(print_dict)
                 );
-                if (res.ptr != NULL)
+                if (res != NULL)
                 {
-                    printf("\t*%s\n", res.ptr);
-                    free(res.ptr);
+                    printf("------------------\n");
+                    printf("-  Definitions   -\n");
+                    printf("------------------\n");
+                    for (size_t i = 0; i < res->count; i++)
+                    {
+                        struct wordbook_definition definition = res->definitions[i];
+
+                        // build a formatted view of the dictionary!
+                        growable_string_t gstr = growable_string_new(strlen(definition.dictionary) + 5);
+                        growable_string_append_cstr(gstr, definition.dictionary);
+                        growable_string_append_cstr(gstr, " (");
+                        growable_string_append_int(gstr, definition.source_language_id);
+                        growable_string_append_char(gstr, '-');
+                        growable_string_append_int(gstr, definition.destination_language_id);
+                        growable_string_append_char(gstr, ')');
+
+                        printf("Dictionary: %s\n", gstr->s);
+                        printf("Definition:\n%s\n", definition.definition);
+
+                        growable_string_delete(gstr);
+                    }
                 }
             }
             printf("--------------------------------------------------------\n\n");
