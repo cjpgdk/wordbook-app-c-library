@@ -1,17 +1,22 @@
 #define _CRT_SECURE_NO_WARNINGS
+#define __GNU_VISIBLE 1
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include <string.h>
 #include "wordbooklib.h"
 #include "growablestring.h"
 #include "wordbook-lookup.h"
-#ifdef _MSC_VER
+
+#if defined(WIN32) || defined(WIN64)
+#define strcasecmp _stricmp
 #include "getopt.h"
 #else
+#include <strings.h>
 #include <getopt.h>
-#endif // _MSC_VER
+#endif
 
 
 #if _DEBUG
@@ -171,31 +176,19 @@ void print_all_dictionaries(const char *search)
         bool print = true;
         if (search != NULL)
         {
-#ifdef _MSC_VER
-            print = _strcmpi(dict.id, search) == 0;
-#else
-            print = strcmpi(dict.id, search) == 0;
-#endif
+            print = strcasecmp(dict.id, search) == 0;
             if (!print)
             {
-#ifdef _MSC_VER
-                print = _strcmpi(dict.short_name, search) == 0;
-#else
-                print = strcmpi(dict.short_name, search) == 0;
-#endif
-                if (!print && (strstr_i(dict.short_name, search) != NULL))
+                print = strcasecmp(dict.short_name, search) == 0;
+                if (!print && (findinstr(dict.short_name, search) == 1))
                 {
                     print = true;
                 }
             }
             if (!print)
             {
-#ifdef _MSC_VER
-                print = _strcmpi(dict.long_name, search) == 0;
-#else
-                print = strcmpi(dict.long_name, search) == 0;
-#endif
-                if (!print && (strstr_i(dict.long_name, search) != NULL))
+                print = strcasecmp(dict.long_name, search) == 0;
+                if (!print && (findinstr(dict.long_name, search) == 1))
                 {
                     print = true;
                 }
@@ -216,21 +209,39 @@ void print_all_dictionaries(const char *search)
     wordbook_array_dictionary_free(dict_array);
 }
 
-// convert all chars to lower and reutrn strstr (Return cannot be used! Only checked!)
-char *strstr_i(const char *s1, const char *s2)
+int findinstr(const char *str, const char *find)
 {
-    char *p1 = s1;
-    char *p2 = s2;
-    int len1 = strlen(p1);
-    int len2 = strlen(p2);
-    for (size_t i = 0; i < len1; i++)
+
+    char *s1 = malloc((strlen(str) + 1) * sizeof(char));
+    if (s1 == NULL)
     {
-        p1[i] = tolower(p1[i]);
+        return 0;
+    }
+    strcpy(s1, str);
+    
+    char *s2 = malloc((strlen(find) + 1) * sizeof(char));
+    if (s2 == NULL)
+    {
+        free(s1);
+        return 0;
+    }
+    strcpy(s2, find);
+
+    size_t len = strlen(s1);
+    for (size_t i = 0; i < len; i++)
+    {
+        s1[i] = tolower(s1[i]);
     }
 
-    for (size_t i = 0; i < len2; i++)
+    len = strlen(s2);
+    for (size_t i = 0; i < len; i++)
     {
-        p2[i] = tolower(p2[i]);
+        s2[i] = tolower(s2[i]);
     }
-    return strstr(p1, p2);
+
+    int result = strstr(s1, s2) != NULL;
+
+    free(s2);
+    free(s1);
+    return result;
 }

@@ -1,4 +1,4 @@
-#ifdef _MSC_VER
+#if defined(WIN32) || defined(WIN64)
 
 /*
  * Implementation of getopt for windows.
