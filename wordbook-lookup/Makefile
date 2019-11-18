@@ -1,17 +1,19 @@
+
+WORDBOOKLIB_DIR=../wordbooklib
+CWD=`pwd`
+
+OUTPUT=../bin/wordbook-lookup
+
 all: wordbook-lookup
 
-curlhelper:
-	gcc -c -o curlhelper.o ../wordbooklib/curlhelper.c
-
-growablestring:
-	gcc -c -o growablestring.o ../wordbooklib/growablestring.c
-
-wordbooklib: curlhelper growablestring
-	gcc -c -o wordbooklib.o ../wordbooklib/wordbooklib.c
+wordbooklib:
+	cd ${WORDBOOKLIB_DIR} && make
 
 wordbook-lookup: wordbooklib
-	gcc -g -v -Wall -std=gnu99 -o wordbook-lookup -I../wordbooklib/ wordbook-lookup.c wordbooklib.o growablestring.o curlhelper.o \
-	-ljson-c -lcurl
+	cd ${CWD} && gcc -g -v -Wall -std=gnu99 -o ${OUTPUT} wordbook-lookup.c \
+	-L../bin/lib -I../bin/include \
+	-lcurl -lwordbook -ljson-c
 
 clean:
 	rm -f *.o
+	rm -f *.a
