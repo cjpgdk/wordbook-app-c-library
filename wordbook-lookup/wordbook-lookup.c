@@ -153,13 +153,13 @@ void print_help_text(const char *app)
     printf("\tList all dictionaries\n");
     printf(" - ./%s -L dictionary-search\n", app);
     printf("\tList only dictionaries where id, long name or short name matches 'dictionary-search'\n");
-    printf("\teg. ./%s -D english\n", app);
+    printf("\teg. ./%s -L english\n", app);
     printf(" - ./%s -s phrase\n", app);
     printf("\tList all suggestions for the phrase (Max 25 will be returned)\n");
-    printf(" - ./%s -s phrase -D dictionary-id\n", app);
+    printf(" - ./%s -s phrase -L dictionary-id\n", app);
     printf("\tList all suggestions for the phrase but only in the dictionary with id of dictionary-id.\n");
     printf("\t * Max 25 will be returned\n");
-    printf("\teg. ./%s -s 'hello' -D 2-1\n", app);
+    printf("\teg. ./%s -s 'hello' -L 2-1\n", app);
 }
 
 // print all dictionaries
