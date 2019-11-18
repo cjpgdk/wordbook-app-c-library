@@ -6,7 +6,7 @@
 
 // growable string a simplifyed version of dyn-string 
 // https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c
-growable_string_t growable_string_new(int space)
+growable_string_t growable_string_new(size_t space)
 {
     growable_string_t result;
     result = (growable_string_t)malloc(sizeof(struct growable_string));
@@ -26,7 +26,7 @@ growable_string_t growable_string_new(int space)
 // https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c
 int growable_string_append_cstr(growable_string_t dest, const char* s)
 {
-    int len = strlen(s);
+    size_t len = strlen(s);
 
     /* The new length is the old length plus the size of our string, plus
        one for the null at the end.  */
@@ -60,7 +60,7 @@ int growable_string_append_char(growable_string_t dest, char c)
 int growable_string_append_int(growable_string_t dest, int i)
 {
     /* convert integer to string.  */
-    int len = snprintf(NULL, 0, "%i", i);
+    size_t len = snprintf(NULL, 0, "%i", i);
     char *stri = malloc(len + 1);
     // append
     if (stri)
@@ -75,7 +75,7 @@ int growable_string_append_int(growable_string_t dest, int i)
 
 // growable string a simplifyed version of dyn-string 
 // https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c
-int growable_string_init(struct growable_string *gs_struct_ptr, int space)
+int growable_string_init(struct growable_string *gs_struct_ptr, size_t space)
 {
     /* We need at least one byte in which to store the terminating NUL.  */
     if (space == 0)
@@ -95,9 +95,9 @@ int growable_string_init(struct growable_string *gs_struct_ptr, int space)
 
 // growable string a simplifyed version of dyn-string 
 // https://github.com/gcc-mirror/gcc/blob/master/libiberty/dyn-string.c
-growable_string_t growable_string_resize(growable_string_t gs, int space)
+growable_string_t growable_string_resize(growable_string_t gs, size_t space)
 {
-    int new_allocated = gs->allocated;
+    size_t new_allocated = gs->allocated;
     /* Increase SPACE to hold the NUL termination.  */
     ++space;
     /* Increase allocation by factors of two.  */

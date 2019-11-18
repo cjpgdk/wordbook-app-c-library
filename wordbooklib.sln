@@ -7,26 +7,59 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wordbook-lookup", "wordbook
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wordbooklib", "wordbooklib\wordbooklib.vcxitems", "{A91BF58B-5607-4692-8B4D-047B7C8A548E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wordbook-lookup-linux", "wordbook-lookup-linux.vcxproj", "{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		wordbooklib\wordbooklib.vcxitems*{8523c64f-c28c-4269-b64b-33f913d811fe}*SharedItemsImports = 4
 		wordbooklib\wordbooklib.vcxitems*{a91bf58b-5607-4692-8b4d-047b7c8a548e}*SharedItemsImports = 9
+		wordbooklib\wordbooklib.vcxitems*{e4384c4e-5540-4c4a-a11a-da65d0bf0d49}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
+		Debug|ARM64 = Debug|ARM64
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|ARM = Release|ARM
+		Release|ARM64 = Release|ARM64
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Debug|ARM.ActiveCfg = Debug|Win32
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Debug|ARM64.ActiveCfg = Debug|Win32
 		{8523C64F-C28C-4269-B64B-33F913D811FE}.Debug|x64.ActiveCfg = Debug|x64
 		{8523C64F-C28C-4269-B64B-33F913D811FE}.Debug|x64.Build.0 = Debug|x64
 		{8523C64F-C28C-4269-B64B-33F913D811FE}.Debug|x86.ActiveCfg = Debug|Win32
 		{8523C64F-C28C-4269-B64B-33F913D811FE}.Debug|x86.Build.0 = Debug|Win32
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Release|ARM.ActiveCfg = Release|Win32
+		{8523C64F-C28C-4269-B64B-33F913D811FE}.Release|ARM64.ActiveCfg = Release|Win32
 		{8523C64F-C28C-4269-B64B-33F913D811FE}.Release|x64.ActiveCfg = Release|x64
 		{8523C64F-C28C-4269-B64B-33F913D811FE}.Release|x64.Build.0 = Release|x64
 		{8523C64F-C28C-4269-B64B-33F913D811FE}.Release|x86.ActiveCfg = Release|Win32
 		{8523C64F-C28C-4269-B64B-33F913D811FE}.Release|x86.Build.0 = Release|Win32
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|ARM.ActiveCfg = Debug|ARM
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|ARM.Build.0 = Debug|ARM
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|ARM.Deploy.0 = Debug|ARM
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|ARM64.Build.0 = Debug|ARM64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|x64.ActiveCfg = Debug|x64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|x64.Build.0 = Debug|x64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|x64.Deploy.0 = Debug|x64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|x86.ActiveCfg = Debug|x86
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Debug|x86.Build.0 = Debug|x86
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|ARM.ActiveCfg = Release|ARM
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|ARM.Build.0 = Release|ARM
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|ARM.Deploy.0 = Release|ARM
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|ARM64.ActiveCfg = Release|ARM64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|ARM64.Build.0 = Release|ARM64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|ARM64.Deploy.0 = Release|ARM64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|x64.ActiveCfg = Release|x64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|x64.Build.0 = Release|x64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|x64.Deploy.0 = Release|x64
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|x86.ActiveCfg = Release|x86
+		{E4384C4E-5540-4C4A-A11A-DA65D0BF0D49}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

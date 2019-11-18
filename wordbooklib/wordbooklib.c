@@ -10,6 +10,11 @@
 #include <string.h>
 #include <json-c/json.h>
 
+#if defined(WIN32) || defined(WIN64)
+#define strcasecmp _stricmp
+#else
+#include <strings.h>
+#endif
 
 /*****************************
  * Helpers!
@@ -24,7 +29,7 @@ int get_destination_language_id_from_dict_id(const char *dict_id)
     {
         return 0;
     }
-    int start_append = 0;
+    size_t start_append = 0;
     for (size_t i = 0; i < len; i++)
     {
         if (start_append == 1)
@@ -111,7 +116,7 @@ wordbook_array_definition_t wordbook_get_definitions(
                 // check the data and only get that type!
                 struct json_object* definitions_array = json_object_iter_peek_value(&dictionaries_it);
                 // each name is the id of a dictionary!
-                const char* name = json_object_iter_peek_name(&dictionaries_it);
+                //const char* name = json_object_iter_peek_name(&dictionaries_it);
                 if (json_object_is_type(definitions_array, json_type_array))
                 {
                     // the actual definition array, for a word, in the dictionary
@@ -139,11 +144,7 @@ wordbook_array_definition_t wordbook_get_definitions(
 
                             const char *definition_name = json_object_iter_peek_name(&definition_it);
 
-#ifdef _MSC_VER
-                            if (_strcmpi(definition_name, "definition") == 0)
-#else
                             if (strcasecmp(definition_name, "definition") == 0)
-#endif
                             {
                                 const char *value = json_object_get_string(definition_value);
                                 struct_definition.definition = malloc(strlen(value) + 1);
@@ -153,11 +154,7 @@ wordbook_array_definition_t wordbook_get_definitions(
                                 }
                                 strcpy(struct_definition.definition, value);
                             }
-#ifdef _MSC_VER
-                            else if (_strcmpi(definition_name, "dictionary") == 0)
-#else
                             else if (strcasecmp(definition_name, "dictionary") == 0)
-#endif
                             {
                                 const char *value = json_object_get_string(definition_value);
                                 struct_definition.dictionary = malloc(strlen(value) + 1);
@@ -167,27 +164,15 @@ wordbook_array_definition_t wordbook_get_definitions(
                                 }
                                 strcpy(struct_definition.dictionary, value);
                             }
-#ifdef _MSC_VER
-                            else if (_strcmpi(definition_name, "word_id") == 0)
-#else
                             else if (strcasecmp(definition_name, "word_id") == 0)
-#endif
                             {
                                 struct_definition.word_id = json_object_get_int(definition_value);
                             }
-#ifdef _MSC_VER
-                            else if (_strcmpi(definition_name, "dest_language_id") == 0)
-#else
                             else if (strcasecmp(definition_name, "dest_language_id") == 0)
-#endif
                             {
                                 struct_definition.destination_language_id = json_object_get_int(definition_value);
                             }
-#ifdef _MSC_VER
-                            else if (_strcmpi(definition_name, "src_language_id") == 0)
-#else
                             else if (strcasecmp(definition_name, "src_language_id") == 0)
-#endif
                             {
                                 struct_definition.source_language_id = json_object_get_int(definition_value);
                             }
@@ -220,7 +205,7 @@ curl_download_result wordbook_get_dictionary_definitions_json(
     const int source_language_id,  /* The id of the source language */
     const int destination_language_id  /* The id of the destination language */)
 {
-    int len = strlen(API_BASE_URL API_PATH_DEFINITIONS "?");
+    size_t len = strlen(API_BASE_URL API_PATH_DEFINITIONS "?");
     growable_string_t gstr = growable_string_new(len);
     growable_string_append_cstr(gstr, API_BASE_URL);
     growable_string_append_cstr(gstr, API_PATH_DEFINITIONS);
@@ -389,12 +374,12 @@ wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const c
                 return NULL;
             }
 
-            int suggestions_count = json_object_array_length(suggestions_obj);
+            size_t suggestions_count = json_object_array_length(suggestions_obj);
 
             // initialize the suggestions array
             initialize_array_wordbook_suggestions(suggest_array, suggestions_count);
 
-            for (int i = 0; i < suggestions_count; i++)
+            for (size_t i = 0; i < suggestions_count; i++)
             {
                  // get the array item at index 'i'
                 json_object *obj = json_object_array_get_idx(suggestions_obj, i);
@@ -431,11 +416,7 @@ wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const c
                             const char *value = json_object_get_string(obj_val);
 
                             // Copy language name
-#ifdef _MSC_VER
-                            if (_strcmpi(name, "language") == 0)
-#else
                             if (strcasecmp(name, "language") == 0)
-#endif
                             {
                                 suggest.source_language_name = malloc(strlen(value) + 1);
                                 if (suggest.source_language_name == NULL)
@@ -445,11 +426,7 @@ wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const c
                                 strcpy(suggest.source_language_name, value);
                             }
                             // Copy the word
-#ifdef _MSC_VER
-                            else if (_strcmpi(name, "word") == 0)
-#else
                             else if (strcasecmp(name, "word") == 0)
-#endif
                             {
                                 suggest.word = malloc(strlen(value) + 1);
                                 if (suggest.word == NULL)
@@ -462,20 +439,12 @@ wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const c
                              * These are int's but, we can't trust that I will keep it that way!
                              */
                             // Copy the language_id
-#ifdef _MSC_VER
-                            else if (_strcmpi(name, "language_id") == 0)
-#else
                             else if (strcasecmp(name, "language_id") == 0)
-#endif
                             {
                                 suggest.source_language_id = atoi(value);
                             }
                             // Copy the word_id
-#ifdef _MSC_VER
-                            else if (_strcmpi(name, "word_id") == 0)
-#else
                             else if (strcasecmp(name, "word_id") == 0)
-#endif
                             {
                                 suggest.word_id = atoi(value);
                             }
@@ -486,20 +455,12 @@ wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const c
                             int32_t value = json_object_get_int(obj_val);
 
                             // Copy the language_id
-#ifdef _MSC_VER
-                            if (_strcmpi(name, "language_id") == 0)
-#else
                             if (strcasecmp(name, "language_id") == 0)
-#endif
                             {
                                 suggest.source_language_id = value;
                             }
                             // Copy the word_id
-#ifdef _MSC_VER
-                            else if (_strcmpi(name, "word_id") == 0)
-#else
                             else if (strcasecmp(name, "word_id") == 0)
-#endif
                             {
                                 suggest.word_id = value;
                             }
@@ -526,7 +487,7 @@ wordbook_array_suggestions_t wordbook_get_suggestions(const char *query, const c
 // get suggestions from wordbook.cjpg.app, based on the query and the selected dictionary
 curl_download_result wordbook_get_dictionary_suggestions_json(const char *query, const char *dict_id)
 {
-    int len = strlen(API_BASE_URL API_PATH_SUGGESTIONS "?");
+    size_t len = strlen(API_BASE_URL API_PATH_SUGGESTIONS "?");
     len += strlen(query);
     growable_string_t gstr = growable_string_new(len);
     growable_string_append_cstr(gstr, API_BASE_URL);
@@ -673,7 +634,7 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
     // declare the array to hold the dictionaries
     wordbook_array_dictionary_t dict_array = (wordbook_array_dictionary_t)malloc(sizeof(struct wordbook_array_dictionary));
 
-    int dictionaries_count = 0;
+    size_t dictionaries_count = 0;
     // make sure we got a pointer
     if (json_result.ptr != NULL)
     {
@@ -690,7 +651,7 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
             initialize_array_wordbook_dictionary(dict_array, dictionaries_count);
 
             // loop the items in the array
-            for (int i = 0; i < dictionaries_count; i++)
+            for (size_t i = 0; i < dictionaries_count; i++)
             {
                 /*
                  * Finaly we got the actual dictionary object!
@@ -721,11 +682,7 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
                             const char *value = json_object_get_string(obj_val);
 
                             // Copy alphabet
-#ifdef _MSC_VER
-                            if (_strcmpi(name, "alphabet") == 0)
-#else
                             if (strcasecmp(name, "alphabet") == 0)
-#endif
                             {
                                 dict.alphabet = malloc(strlen(value) + 1);
                                 if (dict.alphabet == NULL)
@@ -735,11 +692,7 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
                                 strcpy(dict.alphabet, value);
                             }
                             // Copy id
-#ifdef _MSC_VER
-                            else if (_strcmpi(name, "id") == 0)
-#else
                             else if (strcasecmp(name, "id") == 0)
-#endif
                             {
                                 dict.id = malloc(strlen(value) + 1);
                                 if (dict.id == NULL)
@@ -749,11 +702,7 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
                                 strcpy(dict.id, value);
                             }
                             // Copy info
-#ifdef _MSC_VER
-                            else if (_strcmpi(name, "info") == 0)
-#else
                             else if (strcasecmp(name, "info") == 0)
-#endif
                             {
                                 dict.info = malloc(strlen(value) + 1);
                                 if (dict.info == NULL)
@@ -763,11 +712,7 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
                                 strcpy(dict.info, value);
                             }
                             // Copy long name
-#ifdef _MSC_VER
-                            else if (_strcmpi(name, "long") == 0)
-#else
                             else if (strcasecmp(name, "long") == 0)
-#endif
                             {
                                 dict.long_name = malloc(strlen(value) + 1);
                                 if (dict.long_name == NULL)
@@ -777,11 +722,7 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
                                 strcpy(dict.long_name, value);
                             }
                             // Copy short name
-#ifdef _MSC_VER
-                            else if (_strcmpi(name, "short") == 0)
-#else
                             else if (strcasecmp(name, "short") == 0)
-#endif
                             {
                                 dict.short_name = malloc(strlen(value) + 1);
                                 if (dict.short_name == NULL)
@@ -791,11 +732,7 @@ wordbook_array_dictionary_t wordbook_get_dictionaries()
                                 strcpy(dict.short_name, value);
                             }
                             // Copy url
-#ifdef _MSC_VER
-                            else if (_strcmpi(name, "url") == 0)
-#else
                             else if (strcasecmp(name, "url") == 0)
-#endif
                             {
                                 dict.url = malloc(strlen(value) + 1);
                                 if (dict.url == NULL)
