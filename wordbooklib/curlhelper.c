@@ -11,7 +11,7 @@
 curl_download_result wordbook_perform_http_get(const char *url)
 {
     CURL* curl;
-    CURLcode res;
+    CURLcode res = CURLE_FAILED_INIT;
     curl_download_result s;
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
